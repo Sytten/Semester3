@@ -189,14 +189,16 @@ int genrand_v32 (int x)
 void genere_ran_D (int D[], int r, int &s);
 void genere_ran_D (int D[], int r, int &s)
 {
+	int bla = 1;
      int n;
      int u, v, uv;
      n = (1 << r);
      for (v = 0; v < n ; v++)
        for (u = 0; u < n ; u++) {
            uv = (v << r) + u;  // uv = v * n  + u;
-           s = genrand_v32(s);
-           D[uv] = s >> 16;   //16 bits significatifs
+           //s = genrand_v32(s);
+           D[uv] = bla;//s >> 16;   //16 bits significatifs
+		 	bla++;
            }
      return;
 };
