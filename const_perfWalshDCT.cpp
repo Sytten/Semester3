@@ -189,6 +189,7 @@ int genrand_v32 (int x)
 void genere_ran_D (int D[], int r, int &s);
 void genere_ran_D (int D[], int r, int &s)
 {
+    /*
      int n;
      int u, v, uv;
      n = (1 << r);
@@ -198,6 +199,15 @@ void genere_ran_D (int D[], int r, int &s)
            s = genrand_v32(s);
            D[uv] = s >> 16;   //16 bits significatifs
            }
+    */
+    int n = (1 << r);
+    for(int x = 0; x < n; x++) {
+        for(int y = 0; y < n; y++) {
+            D[x * n + y] = x * n + y + 1;
+            //printf("%d ", D[x * n + y]);
+        }
+        //printf("\n");
+    }
      return;
 };
 
@@ -515,6 +525,7 @@ int faire_N_test  (ParamChrono& p)
 
     // donnes representant un bloc d'images 
     int D[dim_max_2D];  // non initialisées
+    
 
     // espaces pour transformees
     int    W[dim_max_2D];
@@ -546,7 +557,7 @@ int faire_N_test  (ParamChrono& p)
     // -------------------------------------------------------------------------
     // donnee initiale, avec generateur aleatoire
     int rv = 99; // une variable aléatoire initialisee
-    genere_ran_D(D, r, rv);
+    //genere_ran_D(D, r, rv);
 
     //----------------------------------------------------------------
     // calcul transformee  Walsh 2D 
