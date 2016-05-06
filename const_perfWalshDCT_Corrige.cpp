@@ -40,8 +40,10 @@
   const double Tmax = 1.0;   // temps maximum pour une serie d'iterations
 
 // constantes et parametres
-  const  int kr = 3;         // constante kr avec n = 2**kr  CHANGER AU BESOIN
+    const  int kr = 3;         // constante kr avec n = 2**kr  CHANGER AU BESOIN
                              // exemple: avec kr = 6: dimension nxn de D: 64x64 = 4096
+    const int increment = 100;
+
   const  int dim_max_2D = 4096;
   const  int dim_max_1D = 64;
                              // constante pi  http://pi.lacim.uqam.ca/piDATA/pi.html
@@ -198,7 +200,7 @@ void genere_ran_D (int D[], int r, int &s)
            uv = (v << r) + u;  // uv = v * n  + u;
            //s = genrand_v32(s);
            D[uv] = bla;//s >> 16;   //16 bits significatifs
-		 	bla++;
+		 	bla += increment;
            }
      return;
 };
