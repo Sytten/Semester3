@@ -102,6 +102,11 @@ rp:     addi    $v0, $0, 1      # return 1
               
 # FONCTIONDE CALCUL DE WALSH #
 ##############################
+# S0: n
+# S1: Tableau entree
+# S2: Tableau coeff
+# S3: Tableau resultant
+# S4: n*n*4
 Walsh_2D_base:
 	#Enregistrer parametre
 	move $s0, $a0 #n
@@ -109,37 +114,93 @@ Walsh_2D_base:
 	
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-
-	# Allocation memoire sur le heap
+	
+	# Calculer taille bytes tableau
+	mul $s4, $s0, $s0
+	mul $s4, $s4, 4
+	
+	# Allocation memoire sur le heap pour resultant
 	ori $v0, $0, 9
-	mul $a0, $a0, $a0
-	mul $a0, $a0, 4
+	move $a0, $s4
+	syscall
+	
+	# Copier adresse memoire de retour (tableau)
+	move $s3, $v0 #tableau resultant
+
+	# Allocation memoire sur le heap pour coeff
+	ori $v0, $0, 9
+	move $a0, $s4
 	syscall
 	
 	# Copier adresse memoire de retour (tableau)
 	move $s2, $v0 #tableau des coeff
 	
-	# Calculer taille bytes tableau
-	mul $s3, $s0, $s0
-	mul $s3, $s3, 4
-	
 	#Populer tableau de coefficients
-	ori $s4, $0, 0
+	ori $s5, $0, 0
 	lw $a2, r($0)
 bcle_coeff_walsh:
-	beq $s4,$s3,fbcle_coeff_walsh
+	beq $s5,$s4,fbcle_coeff_walsh
 	
-	div $a0, $s4, 4
-	rem $a1, $a0, $s0
-	div $a0, $a0, $s0
+	div $a0, $s5, 4
+	rem $a1, $a0, $s0 	# Calcul colonne (i %n)
+	div $a0, $a0, $s0 	# Calcul range (i / n)
 	
 	jal wscoeff
 	
-	addu $t0, $s4, $s2
+	addu $t0, $s5, $s2
 	sw $v0, 0($t0)
-	addiu $s4, $s4, 4
+	addiu $s5, $s5, 4
 	j bcle_coeff_walsh
 fbcle_coeff_walsh:
+	
+	ori $t0, $0, 0 		# t0 <- 0 (compteur externe)
+bcle_externe_walsh:
+	beq $t0, $s4, fbcle_externe_walsh
+	ori $t1, $0, 0 		# t1 <- 0 (compteur interne)
+	ori $t2, $0, 0 		# t2 <- 0 (valeur calculee)
+	
+bcle_interne_walsh:
+	beq $t1, $s4, fbcle_interne_walsh
+	
+	div $t4, $t0, 4
+	rem $t7, $t4, $s0	# Calcul colonne boucle externe (i % n) -> u
+	div $t6, $t4, $s0	# Calcul range boucle externe (i / n) -> v
+	
+	div $t4, $t1, 4
+	rem $t5, $t4, $s0	# Calcul colonne boucle interne (i % n) -> x
+	div $t4, $t4, $s0	# Calcul range boucle interne (i / n) -> y
+
+	addu $t3, $t1, $s1	# Calcul adresse xy
+	lw $s5, 0($t3)		# Lecture de D[xy]
+	
+	mul $t3, $t7, $s0	# u * n
+	addu $t3, $t3, $t5	# (u * n) + x
+	mul $t3, $t3, 4		# Bon nombre bytes
+	addu $t3, $t3, $s2	# calcul adresse coefficient (u * n) + x
+	lw $s6, 0($t3)		# Lecture du coefficient (u * n) + x
+	
+	mul $s5, $s5, $s6	# Multiplication D[xy] * coeff[(u * n) + x]
+	
+	mul $t3, $t6, $s0	# v * n
+	addu $t3, $t3, $t4	# (v * n) + y
+	mul $t3, $t3, 4		# Bon nombre bytes
+	addu $t3, $t3, $s2	# calcul adresse coefficient (v * n) + y
+	lw $s6, 0($t3)		# Lecture du coefficient (v * n) + y
+	
+	mul $s5, $s5, $s6	# Multiplication D[xy] * coeff[(u * n) + x] * coeff[(v * n) + y]
+	
+	add $t2, $t2, $s5	# W[uv] + D[xy] * coeff[(u * n) + x] * coeff[(v * n) + y]
+	
+	addiu $t1, $t1, 4 	# Incrementer compteur interne
+	j bcle_interne_walsh
+fbcle_interne_walsh:
+	addu $t3, $t0, $s3 	# Calculer adresse enregistrement tableau sortie
+	sw $t2, 0($t3)		# Enregistrer valeur calculee
+	addiu $t0, $t0, 4	# Incrementer compteur externe
+	j bcle_externe_walsh
+	
+fbcle_externe_walsh:
+	move $v0, $s3
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	jr $ra	
