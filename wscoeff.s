@@ -11,32 +11,31 @@ r:	.word 3
   
 .text
 main:
-	ori $t0, $0, 1
-	lw $s0, r($0)
-	sllv $s0, $t0, $s0
+	# Calcul du n
+	ori $t0, $0, 1		# t0 <- 1
+	lw $s0, r($0)		# Lecture de r
+	sllv $s0, $t0, $s0	# n = 1 << r
 	
 	# Allocation memoire sur le heap
-	ori $v0, $0, 9
-	mul $a0, $s0, $s0
-	mul $a0, $a0, 4
-	syscall
-	
-	# Copier adresse memoire de retour (tableau)
-	move $s1, $v0
+	ori $v0, $0, 9		# Numero du call systeme
+	mul $a0, $s0, $s0	# n * n
+	mul $a0, $a0, 4		# 4 * n * n (taille tableau en bytes)
+	syscall			# Allocation
+	move $s1, $v0		# Copie adresse memoire de retour
 	
 	# Population du teableau
-	ori $t0, $0, 0
-	ori $t1, $0, 1
+	ori $t0, $0, 0		# t0 <- 0 (compteur)
+	ori $t1, $0, 1		# t1 <- 1 (valeur)
 bcle:
-	beq $t0,$a0,fbcle
-	addu $t2, $t0, $s1
-	sw $t1, 0($t2)
-	addiu $t1, $t1, 1
-	addiu $t0, $t0, 4
+	beq $t0,$a0,fbcle	# Si t0 == a0 (taille tableau entree), fin
+	addu $t2, $t0, $s1	# Calcul adresse tableau entree
+	sw $t1, 0($t2)		# Enregistrer valeur dans tableau
+	addiu $t1, $t1, 1	# Incrementer valeur
+	addiu $t0, $t0, 4	# Incrementer compteur
 	j bcle
 fbcle:	
-	move $a0, $s0 # Parametre n
-	move $a1, $s1 # Parametre Tableau
+	move $a0, $s0 		# Passage parametre n
+	move $a1, $s1 		# Passage parametre Tableau entree
 	
 	jal Walsh_2D_base
 	j Exit
@@ -108,51 +107,47 @@ rp:     addi    $v0, $0, 1      # return 1
 # S3: Tableau resultant
 # S4: n*n*4
 Walsh_2D_base:
-	#Enregistrer parametre
-	move $s0, $a0 #n
-	move $s1, $a1 #tableau original
+	# Enregistrer parametre
+	move $s0, $a0 		# Parametre n
+	move $s1, $a1 		# Parametre Tableau entree
 	
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
+	addi $sp, $sp, -4	# Allocation memoire stack
+	sw $ra, 0($sp)		# Enregistrer valeur ra
 	
-	# Calculer taille bytes tableau
-	mul $s4, $s0, $s0
-	mul $s4, $s4, 4
+	# Calcul taille des tableaux en bytes
+	mul $s4, $s0, $s0	# n * n
+	mul $s4, $s4, 4		# 4 * n * n (taille tableau en bytes)
 	
-	# Allocation memoire sur le heap pour resultant
-	ori $v0, $0, 9
-	move $a0, $s4
-	syscall
-	
-	# Copier adresse memoire de retour (tableau)
-	move $s3, $v0 #tableau resultant
+	# Allocation memoire sur le heap pour Tableau resultant
+	ori $v0, $0, 9		# Numero du call systeme
+	move $a0, $s4		# Passage de la taille en bytes
+	syscall			# Allocation
+	move $s3, $v0 		# Copie adresse memoire de retour
 
-	# Allocation memoire sur le heap pour coeff
-	ori $v0, $0, 9
-	move $a0, $s4
-	syscall
-	
-	# Copier adresse memoire de retour (tableau)
-	move $s2, $v0 #tableau des coeff
+	# Allocation memoire sur le heap pour Tableau coeff
+	ori $v0, $0, 9		# Numero du call systeme
+	move $a0, $s4		# Passage de la taille en bytes
+	syscall			# Allocation
+	move $s2, $v0 		# Copie adresse memoire de retour
 	
 	#Populer tableau de coefficients
-	ori $s5, $0, 0
-	lw $a2, r($0)
+	ori $s5, $0, 0		# s5 <- 0 (compteur)
+	lw $a2, r($0)		# Passage de r
 bcle_coeff_walsh:
 	beq $s5,$s4,fbcle_coeff_walsh
 	
-	div $a0, $s5, 4
-	rem $a1, $a0, $s0 	# Calcul colonne (i %n)
-	div $a0, $a0, $s0 	# Calcul range (i / n)
+	div $a0, $s5, 4		# i / 4 (car en bytes)
+	rem $a1, $a0, $s0 	# Calcul colonne (i % n)
+	div $a0, $a0, $s0 	# Calcul rangee (i / n)
 	
-	jal wscoeff
+	jal wscoeff		# Calcul coefficient
 	
-	addu $t0, $s5, $s2
-	sw $v0, 0($t0)
-	addiu $s5, $s5, 4
+	addu $t0, $s5, $s2	# Calcul adresse enregistrement coefficient
+	sw $v0, 0($t0)		# Entregistrer coefficient
+	addiu $s5, $s5, 4	# Incrementer compteur
 	j bcle_coeff_walsh
 fbcle_coeff_walsh:
-	
+
 	ori $t0, $0, 0 		# t0 <- 0 (compteur externe)
 bcle_externe_walsh:
 	beq $t0, $s4, fbcle_externe_walsh
@@ -176,7 +171,7 @@ bcle_interne_walsh:
 	mul $t3, $t7, $s0	# u * n
 	addu $t3, $t3, $t5	# (u * n) + x
 	mul $t3, $t3, 4		# Bon nombre bytes
-	addu $t3, $t3, $s2	# calcul adresse coefficient (u * n) + x
+	addu $t3, $t3, $s2	# Calcul adresse coefficient (u * n) + x
 	lw $s6, 0($t3)		# Lecture du coefficient (u * n) + x
 	
 	mul $s5, $s5, $s6	# Multiplication D[xy] * coeff[(u * n) + x]
@@ -200,10 +195,10 @@ fbcle_interne_walsh:
 	j bcle_externe_walsh
 	
 fbcle_externe_walsh:
-	move $v0, $s3
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
-	jr $ra	
+	move $v0, $s3		# Retourner adresse tableau resultant
+	lw $ra, 0($sp)		# Lecture de ra
+	addi $sp, $sp, 4	# Desallocation memoire stack
+	jr $ra			# Retour
 	
 Exit:
 	ori $v0, $0, 0xA
