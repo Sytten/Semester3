@@ -26,11 +26,19 @@ main:
 	# Population du teableau
 	ori $t0, $0, 0		# t0 <- 0 (compteur)
 	ori $t1, $0, 1		# t1 <- 1 (valeur)
+	move $s2, $a0		# Enregister taille tableau
 bcle:
-	beq $t0,$a0,fbcle	# Si t0 == a0 (taille tableau entree), fin
+	beq $t0,$s2,fbcle	# Si t0 == a0 (taille tableau entree), fin
 	addu $t2, $t0, $s1	# Calcul adresse tableau entree
 	sw $t1, 0($t2)		# Enregistrer valeur dans tableau
-	addiu $t1, $t1, 1	# Incrementer valeur
+	addiu $t1, $t1, 100	# Incrementer valeur
+	
+	#li $v0, 41         	# Service 41, int aleatoire
+	#xor $a0, $a0, $a0  	# Generateur aleatoire 0
+	#syscall 
+	#move $t1, $a0		# Recuperer valeur
+	#rem $t1, $t1, 4000	# Limiter a 4000
+	
 	addiu $t0, $t0, 4	# Incrementer compteur
 	j bcle
 fbcle:	
