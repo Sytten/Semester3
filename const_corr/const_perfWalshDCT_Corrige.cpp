@@ -42,7 +42,7 @@
 // constantes et parametres
     const  int kr = 3;         // constante kr avec n = 2**kr  CHANGER AU BESOIN
                              // exemple: avec kr = 6: dimension nxn de D: 64x64 = 4096
-    const int increment = 100;
+    const int increment = 1;
 
   const  int dim_max_2D = 4096;
   const  int dim_max_1D = 64;
@@ -290,6 +290,31 @@ int wscoeff (int u, int x, int r)
         return 1;
 }
 
+int wscoeff_hadamard (int u, int x, int r);
+// calcul general des tables de noyau de Walsh, methode Pourlakis-Seely
+// ordonnancement dit sequentiel
+int wscoeff_hadamard (int row, int col, int r)
+{
+    if(r == 0)
+        return 1;
+    int n = pow(2, r);
+    int half = n/2;
+    if(row >= half && col >= half ) {
+        row -= half;
+        col -= half;
+       
+        return wscoeff_hadamard(row, col, r - 1) * -1;
+    }
+    else {
+        if(row >= half)
+            row -= half;
+        if(col >= half)
+            col -= half;
+       return wscoeff_hadamard(row, col, r - 1);
+    }
+    
+}
+
 
 //-------------------------------------------------------------------------
 // calcul transformee de Walsh bidimensionnelle, algorithme de base
@@ -386,8 +411,52 @@ void DCT_2D_basei (double S[], double Di[], int r)
                 Di[xy] = (double) (2.0 / n ) * Di[xy];
         }
 }
+void printBit(int n);
+void printBit(int n) {
+    for(int i = 0; i < 32; i++) {
+        if (n & 1)
+            printf("1");
+        else
+            printf("0");
+        n >>= 1;
+    }
+    printf("\n");
+}
 
+int binary_to_gray_reverse(int x1, int r) {
+    // binary_to_gray
+    x1 = x1^(x1 >> 1);
+    
+    unsigned int x = x1;
+    
+    // flip
+    x = ((x >> 1) & 0x55555555u) | ((x & 0x55555555u) << 1);
+    x = ((x >> 2) & 0x33333333u) | ((x & 0x33333333u) << 2);
+    x = ((x >> 4) & 0x0f0f0f0fu) | ((x & 0x0f0f0f0fu) << 4);
+    x = ((x >> 8) & 0x00ff00ffu) | ((x & 0x00ff00ffu) << 8);
+    x = ((x >> 16) & 0xffffu) | ((x & 0xffffu) << 16);
+    x = x >> (32 - r);
 
+    return x;
+}
+
+int reverse_gray_to_binary(int x1, int r) {
+    unsigned int x = x1;
+    
+    // flip
+    x = ((x >> 1) & 0x55555555u) | ((x & 0x55555555u) << 1);
+    x = ((x >> 2) & 0x33333333u) | ((x & 0x33333333u) << 2);
+    x = ((x >> 4) & 0x0f0f0f0fu) | ((x & 0x0f0f0f0fu) << 4);
+    x = ((x >> 8) & 0x00ff00ffu) | ((x & 0x00ff00ffu) << 8);
+    x = ((x >> 16) & 0xffffu) | ((x & 0xffffu) << 16);
+    x = x >> (32 - r);
+    
+    
+    // gray_to_binary
+    x = x^(x >> 1);
+    return x;
+    
+}
 
 //-------------------------------------------------------------------------
 // faire_un_test()
@@ -439,12 +508,37 @@ int faire_un_test()
     printf ("\n-----------------------------------------------------------------") ;
     printf ("\nfaire_un_test--Walsh 2D------------------------------------------") ;
     printf ("\n-------------Coefficients Walsh 2D par wscoeff(x,y,r)------------\n") ;
+    for (y = 0; y < n ; y++){
+        for (x = 0; x < n ; x++) {
+            printf ("%2.1d ", wscoeff(x,y,r)) ;
+        }
+      printf ("\n") ;
+    }
+    
+    // -------------------------------------------------------------------------
+    // Transformee de Walsh 2D
+    printf ("\n-----------------------------------------------------------------") ;
+    printf ("\nfaire_un_test--Walsh 2D HADAMARD------------------------------------------") ;
+    printf ("\n-------------Coefficients Walsh 2D par wscoeff(x,y,r)------------\n") ;
+    /*
     for (y = 0; y < n ; y++)
     {
-        for (x = 0; x < n ; x++)
-            printf ("%2.1d ", wscoeff(x,y,r)) ;
+        for (x = 0; x < n ; x++) {
+            int xtmp = 2;
+            int ytmp = 3;
+            xtmp = x^(x >> 1);
+            ytmp = y^(y >> 1);
+           // printf("%d %d \n", xtmp, ytmp);
+            printf ("%2.1d ", wscoeff_hadamard(xtmp,ytmp,r)) ;
+        }
         printf ("\n") ;
     }
+    */
+    for(int k = 0; k < 8; k++) {
+    
+    }
+    
+    
 
     printf ("\n-----------------------------------------------------------------") ;
     printf ("\nfaire_un_test--Walsh 2D------------------------------------------") ;
@@ -657,6 +751,11 @@ int main( int argc, char **argv, char **envp )
    faire_N_test(mesures);       // repeter plusieurs executions sur donnees pseudo-aleatoires
 
    affiche_resultats(mesures);  // afficher les resultats de temps d'execution
+    //int r = 3;
+    //printf ("%2.1d \n", wscoeff_hadamard(2,1,r)) ;
+   // printf ("%2.1d \n", wscoeff_hadamard(0,4,r)) ;
+   // printf ("%2.1d \n", wscoeff_hadamard(4,0,r)) ;
+  //  printf ("%2.1d \n", wscoeff_hadamard(4,4,r)) ;
 
    return 0;
 

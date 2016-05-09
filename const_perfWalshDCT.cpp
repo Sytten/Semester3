@@ -296,6 +296,15 @@ int wscoeff (int u, int x, int r)
         return 1;
 }
 
+int wscoeff_hadamard (int u, int x, int r);
+// calcul general des tables de noyau de Walsh, methode Pourlakis-Seely
+// ordonnancement dit sequentiel
+int wscoeff_hadamard (int u, int x, int r)
+{
+    int n = math.pow(2, r);
+    
+}
+
 
 //-------------------------------------------------------------------------
 // calcul transformee de Walsh bidimensionnelle, algorithme de base
