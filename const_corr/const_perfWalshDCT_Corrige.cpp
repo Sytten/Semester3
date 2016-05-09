@@ -79,6 +79,8 @@ double utime(void)
  return q;
 }
 
+
+
 void ladate_c(char* strdate);
 void ladate_c(char* strdate)
 {
@@ -223,6 +225,64 @@ void genere_ran_double_D (double D[], int r, int &s)
      return;
 };
 
+int binary_to_gray_reverse(int x1, int r);
+int binary_to_gray_reverse(int x1, int r) {
+    // binary_to_gray
+    x1 = x1^(x1 >> 1);
+    
+    unsigned int x = x1;
+    
+    // flip
+    x = ((x >> 1) & 0x55555555u) | ((x & 0x55555555u) << 1);
+    x = ((x >> 2) & 0x33333333u) | ((x & 0x33333333u) << 2);
+    x = ((x >> 4) & 0x0f0f0f0fu) | ((x & 0x0f0f0f0fu) << 4);
+    x = ((x >> 8) & 0x00ff00ffu) | ((x & 0x00ff00ffu) << 8);
+    x = ((x >> 16) & 0xffffu) | ((x & 0xffffu) << 16);
+    x = x >> (32 - r);
+    
+    return x;
+}
+
+void printBit(int n);
+void printBit(int n) {
+    for(int i = 0; i < 32; i++) {
+        if (n & 1)
+            printf("1");
+        else
+            printf("0");
+        n >>= 1;
+    }
+    printf("\n");
+}
+
+
+
+int reverse_gray_to_binary(int x1, int r) {
+    unsigned int x = x1;
+    
+    // flip
+    x = ((x >> 1) & 0x55555555u) | ((x & 0x55555555u) << 1);
+    x = ((x >> 2) & 0x33333333u) | ((x & 0x33333333u) << 2);
+    x = ((x >> 4) & 0x0f0f0f0fu) | ((x & 0x0f0f0f0fu) << 4);
+    x = ((x >> 8) & 0x00ff00ffu) | ((x & 0x00ff00ffu) << 8);
+    x = ((x >> 16) & 0xffffu) | ((x & 0xffffu) << 16);
+    x = x >> (32 - r);
+    
+    
+	// gray_to_binary
+    unsigned int gray = x;
+    unsigned int result = gray & 64;
+    result |= (gray ^ (result >> 1)) & 32;
+    result |= (gray ^ (result >> 1)) & 16;
+    result |= (gray ^ (result >> 1)) & 8;
+    result |= (gray ^ (result >> 1)) & 4;
+    result |= (gray ^ (result >> 1)) & 2;
+    result |= (gray ^ (result >> 1)) & 1;
+    
+    
+    return result;
+    
+}
 
 void print_mat (const int mat[], const int n, const int m, const char legende[], const char format[]);
 void print_mat (const int mat[], const int n, const int m, const char legende[], const char format[])
@@ -331,7 +391,8 @@ void Walsh_2D_base (int D[], int W[], int r)
 	
 	for (y = 0; y < n ; y++) {
     	for (x = 0; x < n ; x++) {
-			coeff[y * n + x] = wscoeff(x,y,r);
+            unsigned int xtmp = binary_to_gray_reverse(x, r);
+			coeff[y * n + x] = wscoeff_hadamard(xtmp,y,r);
 		}
 	}
 	
@@ -411,52 +472,7 @@ void DCT_2D_basei (double S[], double Di[], int r)
                 Di[xy] = (double) (2.0 / n ) * Di[xy];
         }
 }
-void printBit(int n);
-void printBit(int n) {
-    for(int i = 0; i < 32; i++) {
-        if (n & 1)
-            printf("1");
-        else
-            printf("0");
-        n >>= 1;
-    }
-    printf("\n");
-}
 
-int binary_to_gray_reverse(int x1, int r) {
-    // binary_to_gray
-    x1 = x1^(x1 >> 1);
-    
-    unsigned int x = x1;
-    
-    // flip
-    x = ((x >> 1) & 0x55555555u) | ((x & 0x55555555u) << 1);
-    x = ((x >> 2) & 0x33333333u) | ((x & 0x33333333u) << 2);
-    x = ((x >> 4) & 0x0f0f0f0fu) | ((x & 0x0f0f0f0fu) << 4);
-    x = ((x >> 8) & 0x00ff00ffu) | ((x & 0x00ff00ffu) << 8);
-    x = ((x >> 16) & 0xffffu) | ((x & 0xffffu) << 16);
-    x = x >> (32 - r);
-
-    return x;
-}
-
-int reverse_gray_to_binary(int x1, int r) {
-    unsigned int x = x1;
-    
-    // flip
-    x = ((x >> 1) & 0x55555555u) | ((x & 0x55555555u) << 1);
-    x = ((x >> 2) & 0x33333333u) | ((x & 0x33333333u) << 2);
-    x = ((x >> 4) & 0x0f0f0f0fu) | ((x & 0x0f0f0f0fu) << 4);
-    x = ((x >> 8) & 0x00ff00ffu) | ((x & 0x00ff00ffu) << 8);
-    x = ((x >> 16) & 0xffffu) | ((x & 0xffffu) << 16);
-    x = x >> (32 - r);
-    
-    
-    // gray_to_binary
-    x = x^(x >> 1);
-    return x;
-    
-}
 
 //-------------------------------------------------------------------------
 // faire_un_test()
@@ -520,25 +536,21 @@ int faire_un_test()
     printf ("\n-----------------------------------------------------------------") ;
     printf ("\nfaire_un_test--Walsh 2D HADAMARD------------------------------------------") ;
     printf ("\n-------------Coefficients Walsh 2D par wscoeff(x,y,r)------------\n") ;
-    /*
     for (y = 0; y < n ; y++)
     {
         for (x = 0; x < n ; x++) {
-            int xtmp = 2;
-            int ytmp = 3;
-            xtmp = x^(x >> 1);
-            ytmp = y^(y >> 1);
-           // printf("%d %d \n", xtmp, ytmp);
-            printf ("%2.1d ", wscoeff_hadamard(xtmp,ytmp,r)) ;
+            unsigned int xtmp = binary_to_gray_reverse(x, r);
+            printf ("%2.1d ", wscoeff_hadamard(xtmp,y,r)) ;
         }
         printf ("\n") ;
     }
-    */
-    for(int k = 0; k < 8; k++) {
     
+
+    for(int i = 0; i < 8; i++) {
+        printf("%d ", reverse_gray_to_binary(i, kr));
     }
     
-    
+   
 
     printf ("\n-----------------------------------------------------------------") ;
     printf ("\nfaire_un_test--Walsh 2D------------------------------------------") ;
