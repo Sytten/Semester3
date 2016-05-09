@@ -225,6 +225,10 @@ void genere_ran_double_D (double D[], int r, int &s)
      return;
 };
 
+/**
+ * passe d'un index binaire ˆ un index gray. 
+ * - pg
+ */
 int binary_to_gray_reverse(int x1, int r);
 int binary_to_gray_reverse(int x1, int r) {
     // binary_to_gray
@@ -243,6 +247,10 @@ int binary_to_gray_reverse(int x1, int r) {
     return x;
 }
 
+/**
+ * fonction de debug pour imprimer les bits d'un int du LSB au MSB (ATTENTION A L'ENVERS)
+ * - pg
+ */
 void printBit(int n);
 void printBit(int n) {
     for(int i = 0; i < 32; i++) {
@@ -256,7 +264,10 @@ void printBit(int n) {
 }
 
 
-
+/**
+ * passe d'un index gray ˆ un index binaire. 
+ * - pg
+ */
 int reverse_gray_to_binary(int x1, int r) {
     unsigned int x = x1;
     
@@ -350,6 +361,10 @@ int wscoeff (int u, int x, int r)
         return 1;
 }
 
+/**
+ * nouvelle fonction qui permet de calculer les coefficients de hadamard. Ils nŽcessitent d'tre converti avant par contre.
+ * - pg
+*/
 int wscoeff_hadamard (int u, int x, int r);
 // calcul general des tables de noyau de Walsh, methode Pourlakis-Seely
 // ordonnancement dit sequentiel
@@ -519,6 +534,7 @@ int faire_un_test()
 
     print_mat (D, n, n, "\nTableau D pseudo aleatoire SECOND TIRAGE :", "%11.0d, ") ;
 
+/*
     // -------------------------------------------------------------------------
     // Transformee de Walsh 2D
     printf ("\n-----------------------------------------------------------------") ;
@@ -530,11 +546,12 @@ int faire_un_test()
         }
       printf ("\n") ;
     }
+    */
     
     // -------------------------------------------------------------------------
     // Transformee de Walsh 2D
     printf ("\n-----------------------------------------------------------------") ;
-    printf ("\nfaire_un_test--Walsh 2D HADAMARD------------------------------------------") ;
+    printf ("\nfaire_un_test--Walsh 2D HADAMARD ------------------------------------------") ;
     printf ("\n-------------Coefficients Walsh 2D par wscoeff(x,y,r)------------\n") ;
     for (y = 0; y < n ; y++)
     {
@@ -544,12 +561,6 @@ int faire_un_test()
         }
         printf ("\n") ;
     }
-    
-
-    for(int i = 0; i < 8; i++) {
-        printf("%d ", reverse_gray_to_binary(i, kr));
-    }
-    
    
 
     printf ("\n-----------------------------------------------------------------") ;
