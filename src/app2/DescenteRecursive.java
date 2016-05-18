@@ -43,7 +43,7 @@ public class DescenteRecursive {
 	private ElemAST T_E() throws Exception {
 		ElemAST n1 = T_T();
 		if (m_courant != null) {
-			if (m_courant.chaine.equals("+")) {
+			if (m_courant.getChaine().equals("+")) {
 				if (m_analLex.resteTerminal()) {
 					m_courant = m_analLex.prochainTerminal();
 					ElemAST n2 = T_E();
@@ -59,10 +59,10 @@ public class DescenteRecursive {
 
 	private ElemAST T_T() throws Exception {
 		try {
-			int valeur = Integer.valueOf(m_courant.chaine); // Throws if not a
+			int valeur = Integer.valueOf(m_courant.getChaine()); // Throws if not a
 															// number
 
-			ElemAST n = new FeuilleAST(m_courant.chaine, valeur);
+			ElemAST n = new FeuilleAST(m_courant.getChaine(), valeur);
 			if (m_analLex.resteTerminal()) {
 				m_courant = m_analLex.prochainTerminal();
 			} else {
@@ -84,7 +84,7 @@ public class DescenteRecursive {
 	}
 
 	// Methode principale a lancer pour tester l'analyseur syntaxique
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		String toWriteLect = "";
 		String toWriteEval = "";
 
@@ -113,6 +113,6 @@ public class DescenteRecursive {
 			System.exit(51);
 		}
 		System.out.println("Analyse syntaxique terminee");
-	}
+	}*/
 
 }
