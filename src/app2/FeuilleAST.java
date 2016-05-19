@@ -20,7 +20,11 @@ public class FeuilleAST extends ElemAST {
 	/**
 	 * Evaluation de feuille d'AST
 	 */
-	public int EvalAST() {
+	public int EvalAST() throws Exception{
+		if (mTerminal.getType() != Terminal.Type.CONSTANTE) {
+			throw new Exception("Impossible d'évaluer une expression contenant des variables");
+		}
+		
 		int value = 0;
 		try {
 			value = Integer.parseInt(mTerminal.getChaine());
