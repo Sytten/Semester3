@@ -8,27 +8,23 @@ public class ExceptionLexicale extends Exception {
 	private static final long serialVersionUID = 8417942520423733784L;
 
 	public ExceptionLexicale() {
-		super("Exception Lexicale");
+		super("Erreur Lexicale");
 	}
 
 	public ExceptionLexicale(String message, int position) {
-		super(message + ": Position " + position);
-		// TODO Auto-generated constructor stub
+		super("Erreur Lexicale: " + message + ": Position " + position);
 	}
 
 	public ExceptionLexicale(Throwable cause) {
 		super(cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	public ExceptionLexicale(String message, int position, Throwable cause) {
-		super(message + ": Position " + position, cause);
-		// TODO Auto-generated constructor stub
+		super("Erreur Lexicale" + message + ": Position " + position, cause);
 	}
 
 	public ExceptionLexicale(String message, int position, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message + ": Position " + position, cause, enableSuppression, writableStackTrace);
-		// TODO Auto-generated constructor stub
+		super("Erreur Lexicale: " + message + ": Position " + position, cause, enableSuppression, writableStackTrace);
 	}
 
 }
