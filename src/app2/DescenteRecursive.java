@@ -12,7 +12,7 @@ public class DescenteRecursive {
 	// Attributs
 	private AnalLex mAnalLex;
 	private Terminal mCourant;
-	private int mOpennedParentheses = 0;
+	private int mParenthesesOuvertes = 0;
 
 	/**
 	 * Constructeur de DescenteRecursive : - recoit en argument le nom du
@@ -50,7 +50,7 @@ public class DescenteRecursive {
 	 */
 	private ElemAST T_EXP() throws Exception {
 		if (!isInSetPR(mCourant)) {
-			throw new ExceptionLexicale("L'unité lexicale suivante n'est pas dans le SET premier",
+			throw new ExceptionSyntaxique("L'unité lexicale suivante n'est pas dans le SET premier",
 					mAnalLex.getPosition());
 		}
 		ElemAST n1 = T_U();
@@ -59,20 +59,20 @@ public class DescenteRecursive {
 			String opt = mCourant.getChaine();
 			mCourant = mAnalLex.prochainTerminal();
 			if (!isInSetPR(mCourant)) {
-				throw new ExceptionLexicale(
+				throw new ExceptionSyntaxique(
 						"L'unité lexicale suivante n'est pas dans le SET premier",
 						mAnalLex.getPosition());
 			}
 			ElemAST n2 = T_EXP();
 			return new NoeudAST(opt, n1, n2);
 		} else if (mCourant.getChaine().equals("(")) {
-			throw new ExceptionLexicale("Parenthèse après une opérande", mAnalLex.getPosition());
-		} else if (mCourant.getChaine().equals(")") && mOpennedParentheses == 0) {
-			throw new ExceptionLexicale("Parenthèse fermante sans parenthèse ouvrante correspondante", mAnalLex.getPosition());
+			throw new ExceptionSyntaxique("Parenthèse après une opérande", mAnalLex.getPosition());
+		} else if (mCourant.getChaine().equals(")") && mParenthesesOuvertes == 0) {
+			throw new ExceptionSyntaxique("Parenthèse fermante sans parenthèse ouvrante correspondante", mAnalLex.getPosition());
 		} else if (mCourant.getType() == Terminal.Type.CONSTANTE && !mCourant.getChaine().equals("")) {
-			throw new ExceptionLexicale("Constante après une variable sans opérateur", mAnalLex.getPosition());
+			throw new ExceptionSyntaxique("Constante après une variable sans opérateur", mAnalLex.getPosition());
 		} else if (mCourant.getType() == Terminal.Type.VARIABLE && !mCourant.getChaine().equals("")) {
-			throw new ExceptionLexicale("Variable après une constante sans opérateur", mAnalLex.getPosition());
+			throw new ExceptionSyntaxique("Variable après une constante sans opérateur", mAnalLex.getPosition());
 		}
 
 		return n1;
@@ -91,7 +91,7 @@ public class DescenteRecursive {
 			String opt = mCourant.getChaine();
 			mCourant = mAnalLex.prochainTerminal();
 			if (!isInSetPR(mCourant)) {
-				throw new ExceptionLexicale(
+				throw new ExceptionSyntaxique(
 						"L'unité lexicale suivante n'est pas dans le SET premier",
 						mAnalLex.getPosition());
 			}
@@ -125,24 +125,24 @@ public class DescenteRecursive {
 			return n;
 		} else if (mCourant.getChaine().equals("(")) {
 			mCourant = mAnalLex.prochainTerminal();
-			mOpennedParentheses++;
+			mParenthesesOuvertes++;
 			if (!isInSetPR(mCourant)) {
-				throw new ExceptionLexicale(
+				throw new ExceptionSyntaxique(
 						"L'unité lexicale suivante n'est pas dans le SET premier",
 						mAnalLex.getPosition());
 			}
 			ElemAST n = T_EXP();
 			if (mCourant.getChaine().equals(")")) {
 				mCourant = mAnalLex.prochainTerminal();
-				mOpennedParentheses--;
+				mParenthesesOuvertes--;
 				return n;
 			} else {
-				throw new ExceptionLexicale("Il manque la parenthèse fermante",
+				throw new ExceptionSyntaxique("Il manque la parenthèse fermante",
 						mAnalLex.getPosition());
 			}
 
 		}
-		throw new ExceptionLexicale(
+		throw new ExceptionSyntaxique(
 				"Mauvaise concatenation des opérateurs ou expression finissant par un opérateur",
 				mAnalLex.getPosition());
 	}
