@@ -12,6 +12,7 @@ public class DescenteRecursive {
 	// Attributs
 	private AnalLex mAnalLex;
 	private Terminal mCourant;
+	private int mOpennedParentheses = 0;
 
 	/**
 	 * Constructeur de DescenteRecursive : - recoit en argument le nom du
@@ -66,8 +67,12 @@ public class DescenteRecursive {
 			return new NoeudAST(opt, n1, n2);
 		} else if (mCourant.getChaine().equals("(")) {
 			throw new ExceptionLexicale("Erreur Syntaxique : parenthèse après une opérande", mAnalLex.getPosition());
+		} else if (mCourant.getChaine().equals(")") && mOpennedParentheses == 0) {
+			throw new ExceptionLexicale("Erreur Syntaxique : parenthèse fermante sans parenthèse ouvrante correspondante", mAnalLex.getPosition());
 		} else if (mCourant.getType() == Terminal.Type.CONSTANTE && !mCourant.getChaine().equals("")) {
-			throw new ExceptionLexicale("Erreur Syntaxique : constante après une variable", mAnalLex.getPosition());
+			throw new ExceptionLexicale("Erreur Syntaxique : constante après une variable sans opérateur", mAnalLex.getPosition());
+		} else if (mCourant.getType() == Terminal.Type.VARIABLE && !mCourant.getChaine().equals("")) {
+			throw new ExceptionLexicale("Erreur Syntaxique : variable après une constante sans opérateur", mAnalLex.getPosition());
 		}
 
 		return n1;
@@ -120,6 +125,7 @@ public class DescenteRecursive {
 			return n;
 		} else if (mCourant.getChaine().equals("(")) {
 			mCourant = mAnalLex.prochainTerminal();
+			mOpennedParentheses++;
 			if (!isInSetPR(mCourant)) {
 				throw new ExceptionLexicale(
 						"Erreur Syntaxique : l'unité lexicale suivante n'est pas dans le SET premier",
@@ -128,6 +134,7 @@ public class DescenteRecursive {
 			ElemAST n = T_EXP();
 			if (mCourant.getChaine().equals(")")) {
 				mCourant = mAnalLex.prochainTerminal();
+				mOpennedParentheses--;
 				return n;
 			} else {
 				throw new ExceptionLexicale("Erreur Syntaxique : il manque la parenthèse fermante",
