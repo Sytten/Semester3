@@ -8,16 +8,16 @@ package app2;
 public class AnalLex {
 
 	// Attributs
-	private String m_expression;
+	private String mExpression;
 
-	private int m_etat = 0;
-	private int m_ptrLect = 0;
+	private int mEtat = 0;
+	private int mPtrLect = 0;
 
 	/**
 	 * Constructeur pour l'initialisation d'attribut(s)
 	 */
 	public AnalLex(String s) { // arguments possibles
-		m_expression = s;
+		mExpression = s;
 	}
 
 	/**
@@ -26,7 +26,7 @@ public class AnalLex {
 	 * terminal qui n'a pas ete retourne
 	 */
 	public boolean resteTerminal() {
-		if (m_ptrLect < m_expression.length())
+		if (mPtrLect < mExpression.length())
 			return true;
 		return false;
 	}
@@ -37,17 +37,17 @@ public class AnalLex {
   public Terminal prochainTerminal( ) throws Exception {
 	  char c;
 	  String result = "";
-	  while (m_ptrLect < m_expression.length()) {
-		  c = m_expression.charAt(m_ptrLect);
-		  m_ptrLect++;
-		  switch (m_etat) {
+	  while (mPtrLect < mExpression.length()) {
+		  c = mExpression.charAt(mPtrLect);
+		  mPtrLect++;
+		  switch (mEtat) {
 		  	case 0 :
 		  		if (Character.isDigit(c)) {
 		  			result += String.valueOf(c);
-			  		m_etat = 1;
+			  		mEtat = 1;
 		  		} else if (Character.isUpperCase(c)) {
 		  			result += String.valueOf(c);
-		  			m_etat = 2;
+		  			mEtat = 2;
 		  		} else if (c == '+') {
 		  			return new Terminal("+", Terminal.Type.OPERATEUR);
 		  		} else if (c == '-') {
@@ -61,17 +61,17 @@ public class AnalLex {
 		  		} else if (c == ')') {
 		  			return new Terminal(")", Terminal.Type.OPERATEUR);
 		  		} else if (Character.isLowerCase(c)) {
-		  			throw new ExceptionLexicale("Lettre minuscule debut invalide", m_ptrLect);
+		  			throw new ExceptionLexicale("Lettre minuscule debut invalide", mPtrLect);
 		  		} else {
-		  			throw new ExceptionLexicale("Caractere invalide", m_ptrLect);
+		  			throw new ExceptionLexicale("Caractere invalide", mPtrLect);
 		  		}
 		  		break;
 		  	case 1 :
 		  		if (Character.isDigit(c)) {
 		  			result += String.valueOf(c);
 		  		} else {
-		  			m_ptrLect--;
-		  			m_etat = 0;
+		  			mPtrLect--;
+		  			mEtat = 0;
 		  			return new Terminal(result, Terminal.Type.CONSTANTE);
 		  		}
 		  		break;
@@ -80,21 +80,21 @@ public class AnalLex {
 		  			result += String.valueOf(c);
 		  		} else if (c == '_') {
 		  			result += String.valueOf(c);
-		  			m_etat = 3;
+		  			mEtat = 3;
 		  		} else {
-		  			m_ptrLect--;
-		  			m_etat = 0;
+		  			mPtrLect--;
+		  			mEtat = 0;
 		  			return new Terminal(result, Terminal.Type.VARIABLE);
 		  		}
 		  		break;
 		  	case 3:
 		  		if (Character.isLetter(c)) {
 		  			result += String.valueOf(c);
-		  			m_etat = 2;
+		  			mEtat = 2;
 		  		} else if(c == '_') {
-		  			throw new ExceptionLexicale("Double tiret", m_ptrLect);
+		  			throw new ExceptionLexicale("Double tiret", mPtrLect);
 		  		} else {
-		  			throw new ExceptionLexicale("Caractere invalide", m_ptrLect);
+		  			throw new ExceptionLexicale("Caractere invalide", mPtrLect);
 		  		}
 		  		break;
 		  	default:
@@ -105,16 +105,16 @@ public class AnalLex {
 	  /**
 	   * Etats non finaux
 	   */
-	  if(m_etat == 3) {
-		  throw new ExceptionLexicale("Tiret de fin", m_ptrLect);
+	  if(mEtat == 3) {
+		  throw new ExceptionLexicale("Tiret de fin", mPtrLect);
 	  }
 	
 	  /**
 	   * Etats finaux
 	   */
-	  if (m_etat == 0) {
+	  if (mEtat == 0) {
 		  return new Terminal(result, Terminal.Type.OPERATEUR);
-	  } else if (m_etat == 1) {
+	  } else if (mEtat == 1) {
 		  return new Terminal(result, Terminal.Type.CONSTANTE);
 	  } else {
 		  return new Terminal(result, Terminal.Type.VARIABLE);
@@ -153,6 +153,6 @@ public class AnalLex {
 
 	public int getPosition() {
 		// TODO Auto-generated method stub
-		return m_ptrLect;
+		return mPtrLect;
 	}
 }
