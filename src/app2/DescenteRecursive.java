@@ -56,7 +56,7 @@ public class DescenteRecursive {
 		ElemAST n1 = T_U();
 
 		if (mCourant.getChaine().equals("+") || mCourant.getChaine().equals("-")) {
-			String opt = mCourant.getChaine();
+			Terminal opt = mCourant;
 			mCourant = mAnalLex.prochainTerminal();
 			if (!isInSetPR(mCourant)) {
 				throw new ExceptionSyntaxique(
@@ -88,7 +88,7 @@ public class DescenteRecursive {
 		ElemAST n1 = T_V();
 
 		if (mCourant.getChaine().equals("*") || mCourant.getChaine().equals("/")) {
-			String opt = mCourant.getChaine();
+			Terminal opt = mCourant;
 			mCourant = mAnalLex.prochainTerminal();
 			if (!isInSetPR(mCourant)) {
 				throw new ExceptionSyntaxique(
@@ -111,16 +111,7 @@ public class DescenteRecursive {
 	private ElemAST T_V() throws Exception {
 
 		if (mCourant.getType() == Type.CONSTANTE || mCourant.getType() == Type.VARIABLE) {
-			// la valeur d'une variable est 0
-			int value = 0;
-			// si c'est une constante on essait d'évaluer sa valeur
-			if (mCourant.getType() == Type.CONSTANTE)
-				try {
-					value = Integer.parseInt(mCourant.getChaine());
-				} catch (Exception e) {
-					// do nothing
-				}
-			ElemAST n = new FeuilleAST(mCourant.getChaine(), value);
+			ElemAST n = new FeuilleAST(mCourant);
 			mCourant = mAnalLex.prochainTerminal();
 			return n;
 		} else if (mCourant.getChaine().equals("(")) {
