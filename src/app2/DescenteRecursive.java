@@ -48,14 +48,20 @@ public class DescenteRecursive {
 	 * @throws Exception
 	 */
 	private ElemAST T_EXP() throws Exception {
+		if(!isInSetPR(m_courant)) {
+			throw new ExceptionLexicale("Erreur Syntaxique : l'unité lexicale suivante n'est pas dans le SET premier", m_analLex.getPosition());
+		}
 		ElemAST n1 = T_U();
 
 		if (m_courant.getChaine().equals("+") || m_courant.getChaine().equals("-")) {
 			String opt = m_courant.getChaine();
 			m_courant = m_analLex.prochainTerminal();
+			if(!isInSetPR(m_courant)) {
+				throw new ExceptionLexicale("Erreur Syntaxique : l'unité lexicale suivante n'est pas dans le SET premier", m_analLex.getPosition());
+			}
 			ElemAST n2 = T_EXP();
 			return new NoeudAST(opt, n1, n2);
-		} else if(m_courant.getChaine().equals("(")) {
+		} else if (m_courant.getChaine().equals("(")) {
 			throw new ExceptionLexicale("Erreur Syntaxique : parenthèse après une opérande", m_analLex.getPosition());
 		}
 
@@ -74,6 +80,9 @@ public class DescenteRecursive {
 		if (m_courant.getChaine().equals("*") || m_courant.getChaine().equals("/")) {
 			String opt = m_courant.getChaine();
 			m_courant = m_analLex.prochainTerminal();
+			if(!isInSetPR(m_courant)) {
+				throw new ExceptionLexicale("Erreur Syntaxique : l'unité lexicale suivante n'est pas dans le SET premier", m_analLex.getPosition());
+			}
 			ElemAST n2 = T_U();
 			return new NoeudAST(opt, n1, n2);
 		}
@@ -92,7 +101,7 @@ public class DescenteRecursive {
 		if (m_courant.getType() == Type.CONSTANTE || m_courant.getType() == Type.VARIABLE) {
 			// la valeur d'une variable est 0
 			int value = 0;
-			// si c'est une constante on essait d'évaluer sa valeur 
+			// si c'est une constante on essait d'évaluer sa valeur
 			if (m_courant.getType() == Type.CONSTANTE)
 				try {
 					value = Integer.parseInt(m_courant.getChaine());
@@ -104,16 +113,32 @@ public class DescenteRecursive {
 			return n;
 		} else if (m_courant.getChaine().equals("(")) {
 			m_courant = m_analLex.prochainTerminal();
+			if(!isInSetPR(m_courant)) {
+				throw new ExceptionLexicale("Erreur Syntaxique : l'unité lexicale suivante n'est pas dans le SET premier", m_analLex.getPosition());
+			}
 			ElemAST n = T_EXP();
 			if (m_courant.getChaine().equals(")")) {
 				m_courant = m_analLex.prochainTerminal();
 				return n;
 			} else {
-				throw new ExceptionLexicale("Erreur Syntaxique : il manque la parenthèse fermante", m_analLex.getPosition());
+				throw new ExceptionLexicale("Erreur Syntaxique : il manque la parenthèse fermante",
+						m_analLex.getPosition());
 			}
 
 		}
-		throw new ExceptionLexicale("Erreur Syntaxique : mauvaise concatenation des opérateurs ou expression finissant par un opérateur", m_analLex.getPosition());
+		throw new ExceptionLexicale(
+				"Erreur Syntaxique : mauvaise concatenation des opérateurs ou expression finissant par un opérateur",
+				m_analLex.getPosition());
+	}
+
+	private boolean isInSetPR(Terminal UL) {
+		if(UL.getChaine() == "(" || UL.getType() == Type.CONSTANTE || UL.getType() == Type.VARIABLE) {
+			return true;
+		}
+		else {
+			return false;
+		}
+		
 	}
 
 	// Methode principale a lancer pour tester l'analyseur syntaxique
