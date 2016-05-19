@@ -1,5 +1,7 @@
 package app2;
 
+import app2.Terminal.Type;
+
 /** @author Ahmed Khoumsi */
 
 /**
@@ -29,7 +31,7 @@ public class DescenteRecursive {
 		try {
 			if (m_analLex.resteTerminal()) {
 				m_courant = m_analLex.prochainTerminal();
-				return T_E();
+				return T_EXP();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -39,52 +41,83 @@ public class DescenteRecursive {
 		return null;
 	}
 
-	// Methode pour chaque symbole non-terminal de la grammaire retenue
-	private ElemAST T_E() throws Exception {
-		ElemAST n1 = T_T();
-		if (m_courant != null) {
-			if (m_courant.getChaine().equals("+")) {
-				if (m_analLex.resteTerminal()) {
-					m_courant = m_analLex.prochainTerminal();
-					ElemAST n2 = T_E();
-					return new NoeudAST("+", n1, n2);
-				} else {
-					throw new Exception("Syntaxe invalide");
-				}
-			}
+	/**
+	 * token EXP
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	private ElemAST T_EXP() throws Exception {
+		ElemAST n1 = T_U();
+
+		if (m_courant.getChaine().equals("+") || m_courant.getChaine().equals("-")) {
+			String opt = m_courant.getChaine();
+			m_courant = m_analLex.prochainTerminal();
+			ElemAST n2 = T_EXP();
+			return new NoeudAST(opt, n1, n2);
+		} else if(m_courant.getChaine().equals("(")) {
+			throw new ExceptionLexicale("Erreur Syntaxique : parenthèse après une opérande", m_analLex.getPosition());
 		}
 
 		return n1;
 	}
 
-	private ElemAST T_T() throws Exception {
-		try {
-			int valeur = Integer.valueOf(m_courant.getChaine()); // Throws if not a
-															// number
+	/**
+	 * token U
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	private ElemAST T_U() throws Exception {
+		ElemAST n1 = T_V();
 
-			ElemAST n = new FeuilleAST(m_courant.getChaine(), valeur);
-			if (m_analLex.resteTerminal()) {
-				m_courant = m_analLex.prochainTerminal();
-			} else {
-				m_courant = null;
-			}
-
-			return n;
-
-		} catch (Exception e) {
-			throw new Exception("Syntaxe invalide");
+		if (m_courant.getChaine().equals("*") || m_courant.getChaine().equals("/")) {
+			String opt = m_courant.getChaine();
+			m_courant = m_analLex.prochainTerminal();
+			ElemAST n2 = T_U();
+			return new NoeudAST(opt, n1, n2);
 		}
+
+		return n1;
 	}
 
 	/**
-	 * ErreurSynt() envoie un message d'erreur syntaxique
+	 * token V
+	 * 
+	 * @return
+	 * @throws Exception
 	 */
-	public void ErreurSynt(String s) {
-		//
+	private ElemAST T_V() throws Exception {
+
+		if (m_courant.getType() == Type.CONSTANTE || m_courant.getType() == Type.VARIABLE) {
+			// la valeur d'une variable est 0
+			int value = 0;
+			// si c'est une constante on essait d'évaluer sa valeur 
+			if (m_courant.getType() == Type.CONSTANTE)
+				try {
+					value = Integer.parseInt(m_courant.getChaine());
+				} catch (Exception e) {
+					// do nothing
+				}
+			ElemAST n = new FeuilleAST(m_courant.getChaine(), value);
+			m_courant = m_analLex.prochainTerminal();
+			return n;
+		} else if (m_courant.getChaine().equals("(")) {
+			m_courant = m_analLex.prochainTerminal();
+			ElemAST n = T_EXP();
+			if (m_courant.getChaine().equals(")")) {
+				m_courant = m_analLex.prochainTerminal();
+				return n;
+			} else {
+				throw new ExceptionLexicale("Erreur Syntaxique : il manque la parenthèse fermante", m_analLex.getPosition());
+			}
+
+		}
+		throw new ExceptionLexicale("Erreur Syntaxique : mauvaise concatenation des opérateurs ou expression finissant par un opérateur", m_analLex.getPosition());
 	}
 
 	// Methode principale a lancer pour tester l'analyseur syntaxique
-	/*public static void main(String[] args) {
+	public static void main(String[] args) {
 		String toWriteLect = "";
 		String toWriteEval = "";
 
@@ -113,6 +146,6 @@ public class DescenteRecursive {
 			System.exit(51);
 		}
 		System.out.println("Analyse syntaxique terminee");
-	}*/
+	}
 
 }

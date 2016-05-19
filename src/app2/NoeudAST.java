@@ -25,6 +25,12 @@ public class NoeudAST extends ElemAST {
   public int EvalAST() throws Exception {
 	  if(m_chaine.equals("+")) {
 		  return m_enfantG.EvalAST() + m_enfantD.EvalAST();
+	  } else if (m_chaine.equals("-")) {
+		  return m_enfantG.EvalAST() - m_enfantD.EvalAST();
+	  } else if (m_chaine.equals("*")) {
+		  return m_enfantG.EvalAST() * m_enfantD.EvalAST();
+	  } else if (m_chaine.equals("/")) {
+		  return m_enfantG.EvalAST() / m_enfantD.EvalAST();
 	  }
 
 	  throw new Exception("Noeud Invalide");

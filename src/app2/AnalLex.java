@@ -34,7 +34,7 @@ public class AnalLex {
 /** prochainTerminal() retourne le prochain terminal
       Cette methode est une implementation d'un AEF
  */
-  public Terminal prochainTerminal( ) throws Exception{
+  public Terminal prochainTerminal( ) throws Exception {
 	  char c;
 	  String result = "";
 	  while (m_ptrLect < m_expression.length()) {
@@ -149,5 +149,10 @@ public class AnalLex {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public int getPosition() {
+		// TODO Auto-generated method stub
+		return m_ptrLect;
 	}
 }
