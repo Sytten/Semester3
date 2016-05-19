@@ -66,6 +66,8 @@ public class DescenteRecursive {
 			return new NoeudAST(opt, n1, n2);
 		} else if (m_courant.getChaine().equals("(")) {
 			throw new ExceptionLexicale("Erreur Syntaxique : parenthèse après une opérande", m_analLex.getPosition());
+		} else if (m_courant.getType() == Terminal.Type.CONSTANTE && !m_courant.getChaine().equals("")) {
+			throw new ExceptionLexicale("Erreur Syntaxique : constante après une variable", m_analLex.getPosition());
 		}
 
 		return n1;
