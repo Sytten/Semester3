@@ -49,20 +49,13 @@ public class DescenteRecursive {
 	 * @throws Exception
 	 */
 	private ElemAST T_EXP() throws Exception {
-		if (!isInSetPR(mCourant)) {
-			throw new ExceptionSyntaxique("L'unité lexicale suivante n'est pas dans le SET premier",
-					mAnalLex.getPosition());
-		}
+		
 		ElemAST n1 = T_U();
 
 		if (mCourant.getChaine().equals("+") || mCourant.getChaine().equals("-")) {
 			Terminal opt = mCourant;
 			mCourant = mAnalLex.prochainTerminal();
-			if (!isInSetPR(mCourant)) {
-				throw new ExceptionSyntaxique(
-						"L'unité lexicale suivante n'est pas dans le SET premier",
-						mAnalLex.getPosition());
-			}
+			
 			ElemAST n2 = T_EXP();
 			return new NoeudAST(opt, n1, n2);
 		} else if (mCourant.getChaine().equals("(")) {
@@ -90,11 +83,7 @@ public class DescenteRecursive {
 		if (mCourant.getChaine().equals("*") || mCourant.getChaine().equals("/")) {
 			Terminal opt = mCourant;
 			mCourant = mAnalLex.prochainTerminal();
-			if (!isInSetPR(mCourant)) {
-				throw new ExceptionSyntaxique(
-						"L'unité lexicale suivante n'est pas dans le SET premier",
-						mAnalLex.getPosition());
-			}
+			
 			ElemAST n2 = T_U();
 			return new NoeudAST(opt, n1, n2);
 		}
@@ -117,11 +106,7 @@ public class DescenteRecursive {
 		} else if (mCourant.getChaine().equals("(")) {
 			mCourant = mAnalLex.prochainTerminal();
 			mParenthesesOuvertes++;
-			if (!isInSetPR(mCourant)) {
-				throw new ExceptionSyntaxique(
-						"L'unité lexicale suivante n'est pas dans le SET premier",
-						mAnalLex.getPosition());
-			}
+			
 			ElemAST n = T_EXP();
 			if (mCourant.getChaine().equals(")")) {
 				mCourant = mAnalLex.prochainTerminal();
@@ -138,14 +123,7 @@ public class DescenteRecursive {
 				mAnalLex.getPosition());
 	}
 
-	private boolean isInSetPR(Terminal UL) {
-		if (UL.getChaine() == "(" || UL.getType() == Type.CONSTANTE || UL.getType() == Type.VARIABLE) {
-			return true;
-		} else {
-			return false;
-		}
-
-	}
+	
 
 	// Methode principale a lancer pour tester l'analyseur syntaxique
 	public static void main(String[] args) {
