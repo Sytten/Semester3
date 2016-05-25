@@ -139,7 +139,12 @@ public class AnalLex {
 		try {
 			Terminal t = null;
 			while (lexical.resteTerminal()) {
-				t = lexical.prochainTerminal();
+				try {
+					t = lexical.prochainTerminal();
+				}catch(Exception e) {
+					e.printStackTrace();
+					break;
+				}
 				toWrite += t.getChaine() + "\n"; // toWrite contient le resultat
 			} // d'analyse lexicale
 			System.out.println(toWrite); // Ecriture de toWrite sur la console
