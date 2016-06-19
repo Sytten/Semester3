@@ -63,6 +63,9 @@ main(argc, argv)  int argc; char *argv[];
 	gets_s(buf, BUFFER_LENGTH);
 	server.sin_port = htons((short) atoi(buf)); 
 	
+	printf("Entrer le message à envoyer: ");   
+	gets_s(text, TEXT_LENGH);
+	
     /*  A faire: connection au serveur  */
 	if (connect(sock, (struct sockaddr *) &server, sizeof(server)) != 0) 
 	{
