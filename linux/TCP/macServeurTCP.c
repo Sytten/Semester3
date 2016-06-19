@@ -18,9 +18,10 @@
 #include <sys/wait.h>
 #include <signal.h>
 
-#define PORT "3890"  // ?????????????
+#define PORT "3890"  // le port d'Žcoute
 
 #define BACKLOG 10	 // ?????????????
+#define BUFFER_LENGTH  1024
 
 void sigchld_handler(int s)
 {
@@ -47,9 +48,11 @@ int main(void)
 	int yes=1;
 	char s[INET6_ADDRSTRLEN];
 	int rv;
+    char buf[BUFFER_LENGTH];
+    int numbytes;
 
 	memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_UNSPEC;
+	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE; // ?????
         
@@ -59,7 +62,7 @@ int main(void)
 		return 1;
 	}
 
-	// ?????
+	//
 	for(p = servinfo; p != NULL; p = p->ai_next) {
 		if ((sockfd = socket(p->ai_family, p->ai_socktype,
 				p->ai_protocol)) == -1) {
@@ -88,7 +91,8 @@ int main(void)
 	}
 
 	freeaddrinfo(servinfo); // ????
-
+    
+    
 	if (listen(sockfd, BACKLOG) == -1) {
 		perror("listen");
 		exit(1);
@@ -116,10 +120,20 @@ int main(void)
 			get_in_addr((struct sockaddr *)&their_addr),
 			s, sizeof s);
 		printf("serverTPC: got connection from %s\n", s);
-
+        
+        if ((numbytes = recv(new_fd, buf, BUFFER_LENGTH-1, 0)) == -1) {
+            perror("recv");
+            exit(1);
+        }
+        
+        buf[numbytes] = '\0';
+        printf("client: received '%s'\n",buf);
+            
 		if (!fork()) { // ?????
 			close(sockfd); // ?????
-			if (send(new_fd, "Bonjour, :o)!", 13, 0) == -1)
+            printf("Entrez un message de retour : ");
+            gets(buf);
+			if (send(new_fd, buf, strlen(buf), 0) == -1)
 				perror("send");
 			close(new_fd);
 			exit(0);

@@ -5,15 +5,21 @@
  * permettant l'Žchange de messages dans les deux sens.
 */
 
-
-#include <netdb.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
 #include <sys/types.h>
-#include <netinet/in.h>
 #include <sys/socket.h>
-
+#include <netinet/in.h>
+#include <netdb.h>
 #include <arpa/inet.h>
+#include <sys/wait.h>
+#include <signal.h>
 
-#define PORT "3200"//??????? 
+
+#define PORT "3890"//???????
 
 #define TAILLEMAX 13 // ?????????????
 
@@ -35,8 +41,8 @@ int main(int argc, char *argv[])
 	int retVal;
 	char s[INET6_ADDRSTRLEN];
 
-	if (argc < 2) {
-	    fprintf(stderr,"Usage: clientTCP h™te\n");
+	if (argc < 3) {
+	    fprintf(stderr,"Usage: clientTCP hote message\n");
 	    exit(1);
 	}
 
@@ -77,6 +83,9 @@ int main(int argc, char *argv[])
 
 	freeaddrinfo(servinfo); // ????
 
+    if (send(sockfd, argv[2], strlen(argv[2]), 0) == -1)
+        perror("send");
+    
 	if ((numOctets = recv(sockfd, buf, TAILLEMAX-1, 0)) == -1) {
 	    perror("recv");
 	    exit(1);
