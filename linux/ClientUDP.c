@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 	int retVal;
 	int numOctets;
 
-	if (argc != 4) {
+	if (argc != 3) {
 		fprintf(stderr,"usage: ClientUDP hote message\n");
 		exit(1);
 	}

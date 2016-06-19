@@ -18,7 +18,7 @@
 
 #define MONPORT "1024"	// le port to listen est 1024
 
-#define MAXBUFLEN 5
+#define MAXBUFLEN 25
 
 // retourne addresse en ipv4 ou ipv6
 void *get_in_addr(struct sockaddr *sa)
