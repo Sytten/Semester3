@@ -19,11 +19,11 @@
 #include <signal.h>
 
 
-#define PORT "3890"//???????
+#define PORT "3890" // PORT PAR DEFAUT
 
-#define TAILLEMAX 13 // ?????????????
+#define TAILLEMAX 13 // taille maximum d'un message
 
-// ?????????????????????
+// retourne l'addresse ip de format ipv6 ou ipv4 selon sa version
 void *get_in_addr(struct sockaddr *sa)
 {
 	if (sa->sa_family == AF_INET) {
@@ -41,34 +41,39 @@ int main(int argc, char *argv[])
 	int retVal;
 	char s[INET6_ADDRSTRLEN];
 
+    
 	if (argc < 2) {
 	    fprintf(stderr,"Usage: clientTCP hote [port]\n");
 	    exit(1);
     }
     
+    // assigner le port de la ligne de commande s'il a ŽtŽ spŽcifiŽ
     if(argc != 3)
         argv[2] = PORT;
     
     printf("PORT : %s\n", argv[2]);
 
-	memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
 
+	memset(&hints, 0, sizeof hints);
+	hints.ai_family = AF_UNSPEC; // permet IPv4 ou IPv6
+	hints.ai_socktype = SOCK_STREAM; // socket de type TCP
+
+    
 	if ((retVal = getaddrinfo(argv[1], argv[2], &hints, &servinfo)) != 0) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(retVal));
 		return 1;
 	}
 
     
-	// ??????????????????????
+	// crŽation du socket
 	for(p = servinfo; p != NULL; p = p->ai_next) {
 		if ((sockfd = socket(p->ai_family, p->ai_socktype,
 				p->ai_protocol)) == -1) {
 			perror("clientTCP: socket");
 			continue;
 		}
-
+        
+        // connection au serveur
 		if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
 			close(sockfd);
 			perror("clientTCP: connect");
@@ -83,13 +88,15 @@ int main(int argc, char *argv[])
 		return 2;
 	}
 
+    // imprimer l'addresse ip au format texte
 	inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
 			s, sizeof s);
 	printf("clientTCP: connecting to %s\n", s);
 
-	freeaddrinfo(servinfo); // delete address information
+	freeaddrinfo(servinfo); // supprimer les information de l'addresse serveur
     
    do {
+       // envoyer un message
         printf("enter a message: ");
         fgets(buf, sizeof(buf), stdin);
         if(strcmp(buf,"quit\n") == 0) {
@@ -100,7 +107,7 @@ int main(int argc, char *argv[])
             perror("send");
        
       
-        
+        // recevoir un message
         printf("Waiting to receive\n");
         
         if ((numOctets = recv(sockfd, buf, TAILLEMAX-1, 0)) == -1) {
@@ -116,7 +123,7 @@ int main(int argc, char *argv[])
         
    } while(1);
     
-    close(sockfd);
+    close(sockfd); // fermer la connexion
 	
 
 	return 0;

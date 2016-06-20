@@ -20,7 +20,7 @@
 
 #define PORT "3890"  // le port d'Žcoute
 
-#define BACKLOG 10	 // ?????????????
+#define BACKLOG 10	 //  longueur de la queue des connexions en attente.
 #define BUFFER_LENGTH  1024
 
 void sigchld_handler(int s)
