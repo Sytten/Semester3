@@ -42,15 +42,20 @@ int main(int argc, char *argv[])
 	char s[INET6_ADDRSTRLEN];
 
 	if (argc < 2) {
-	    fprintf(stderr,"Usage: clientTCP hote\n");
+	    fprintf(stderr,"Usage: clientTCP hote [port]\n");
 	    exit(1);
-	}
+    }
+    
+    if(argc != 3)
+        argv[2] = PORT;
+    
+    printf("PORT : %s\n", argv[2]);
 
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
-	if ((retVal = getaddrinfo(argv[1], PORT, &hints, &servinfo)) != 0) {
+	if ((retVal = getaddrinfo(argv[1], argv[2], &hints, &servinfo)) != 0) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(retVal));
 		return 1;
 	}
@@ -87,13 +92,14 @@ int main(int argc, char *argv[])
    do {
         printf("enter a message: ");
         fgets(buf, sizeof(buf), stdin);
+        if(strcmp(buf,"quit\n") == 0) {
+            printf("EXITING\n");
+            break;
+        }
         if (send(sockfd, buf, strlen(buf), 0) == -1)
             perror("send");
        
-       if(strcmp(buf,"quit\n") == 0) {
-           printf("EXITING\n");
-           break;
-       }
+      
         
         printf("Waiting to receive\n");
         

@@ -131,7 +131,7 @@ int main(void)
         buf[numbytes] = '\0';
         printf("client: received '%s'\n",buf);
             
-		if (!fork()) { // ?????
+		if (numbytes != 0) { // ?????
             printf("Entrez un message de retour : ");
             fgets(buf, sizeof(buf), stdin);
 			if (send(new_fd, buf, strlen(buf), 0) == -1)
@@ -143,6 +143,7 @@ int main(void)
         
     
     close(new_fd);
+    
         
     }
 
