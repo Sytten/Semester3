@@ -18,6 +18,7 @@
 #include <netdb.h>
 
 #define PORTSERVEUR "1024"	// port
+#define MAXBUFLEN 25
 
 int main(int argc, char *argv[])
 {
@@ -25,16 +26,21 @@ int main(int argc, char *argv[])
 	struct addrinfo hints, *servinfo, *p;
 	int retVal;
 	int numOctets;
+    char buf[MAXBUFLEN];
 
-	if (argc != 3) {
-		fprintf(stderr,"usage: ClientUDP hote message\n");
+	if (argc != 2) {
+		fprintf(stderr,"usage: ClientUDP hote [port]\n");
 		exit(1);
 	}
+    if(argc != 3)
+        argv[2] = PORTSERVEUR;
+    
+    printf("PORT : %s\n", PORTSERVEUR);
 
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_DGRAM;
-	if ((retVal = getaddrinfo(argv[1], PORTSERVEUR, &hints, &servinfo)) != 0) {
+	if ((retVal = getaddrinfo(argv[1], argv[2], &hints, &servinfo)) != 0) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(retVal));
 		return 1;
 	}
@@ -54,12 +60,15 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "ClientUDP: failed to bind socket\n");
 		return 2;
 	}
-        //??????????????
-	if ((numOctets = sendto(sockfd, argv[2], strlen(argv[2]), 0,
-			 p->ai_addr, p->ai_addrlen)) == -1) {
-		perror("ClientUDP: sendto");
-		exit(1);
-	}
+    do {
+        printf("enter a message : \n");
+        gets(buf);
+        if ((numOctets = sendto(sockfd, buf, strlen(buf), 0,
+                                p->ai_addr, p->ai_addrlen)) == -1) {
+            perror("ClientUDP: sendto");
+            exit(1);
+        }
+    }while(strcmp(buf,"quit") != 0);
 
 	freeaddrinfo(servinfo);
 
