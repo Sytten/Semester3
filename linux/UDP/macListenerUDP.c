@@ -36,7 +36,8 @@ int main(void)
 	struct addrinfo hints, *servinfo, *p;
 	int retVal;
 	int numbytes;
-	struct sockaddr_storage their_addr;
+    int numbytes2;
+    struct sockaddr_storage their_addr;
 	char buf[MAXBUFLEN];
 	socklen_t addr_len;
 	char s[INET6_ADDRSTRLEN];
@@ -77,13 +78,16 @@ int main(void)
 
 	
     while(1) {
+        // receiving message
         printf("listenerUDP: waiting to recvfrom...\n");
         addr_len = sizeof their_addr;
         if ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0,
                                  (struct sockaddr *)&their_addr, &addr_len)) == -1) {
             perror("recvfrom");
-            exit(1);
+            exit(1); 
         }
+        
+       
 
         printf("listenerUDP: got packet from %s\n",
                inet_ntop(their_addr.ss_family,
@@ -92,6 +96,16 @@ int main(void)
         printf("listenerUDP: packet is %d bytes long\n", numbytes);
         buf[numbytes] = '\0';
         printf("listenerUDP: packet contains \"%s\"\n", buf);
+        
+        // send a message
+        printf("enter a message : \n");
+       
+        gets(buf);
+        if ((numbytes2 = sendto(sockfd, buf, strlen(buf), 0,
+                                (struct sockaddr *)&their_addr, addr_len)) == -1) {
+            perror("listenUDP: sendto");
+            exit(1);
+        }
     }
 
 	return 0;

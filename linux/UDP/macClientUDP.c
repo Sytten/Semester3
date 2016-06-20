@@ -26,7 +26,11 @@ int main(int argc, char *argv[])
 	struct addrinfo hints, *servinfo, *p;
 	int retVal;
 	int numOctets;
+    int numbytes;
+    struct sockaddr_storage their_addr;
+    socklen_t addr_len;
     char buf[MAXBUFLEN];
+    char s[INET6_ADDRSTRLEN];
 
 	if (argc < 2) {
 		fprintf(stderr,"usage: ClientUDP hote [port]\n");
@@ -35,7 +39,7 @@ int main(int argc, char *argv[])
     if(argc != 3)
         argv[2] = PORTSERVEUR;
     
-    printf("PORT : %s\n", PORTSERVEUR);
+    printf("PORT : %s\n", argv[2]);
 
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_INET;
@@ -61,6 +65,7 @@ int main(int argc, char *argv[])
 		return 2;
 	}
     do {
+        // send a message
         printf("enter a message : \n");
         gets(buf);
         if ((numOctets = sendto(sockfd, buf, strlen(buf), 0,
@@ -68,6 +73,22 @@ int main(int argc, char *argv[])
             perror("ClientUDP: sendto");
             exit(1);
         }
+        
+        // receiving message
+        printf("listenerUDP: waiting to recvfrom...\n");
+        addr_len = sizeof their_addr;
+        if ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0, (struct sockaddr *)&their_addr,
+                                 &addr_len)) == -1) {
+            perror("recvfrom");
+            exit(1);
+        }
+        
+        
+        
+        printf("listenerUDP: packet is %d bytes long\n", numbytes);
+        buf[numbytes] = '\0';
+        printf("listenerUDP: packet contains \"%s\"\n", buf);
+        
     }while(strcmp(buf,"quit") != 0);
 
 	freeaddrinfo(servinfo);
