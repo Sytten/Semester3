@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 	int numOctets;
     char buf[MAXBUFLEN];
 
-	if (argc != 2) {
+	if (argc < 2) {
 		fprintf(stderr,"usage: ClientUDP hote [port]\n");
 		exit(1);
 	}
