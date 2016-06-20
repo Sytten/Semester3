@@ -98,7 +98,7 @@ int main(void)
 		exit(1);
 	}
 
-	sa.sa_handler = sigchld_handler; // ????
+	sa.sa_handler = sigchld_handler; 
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_RESTART;
 	if (sigaction(SIGCHLD, &sa, NULL) == -1) {
@@ -106,21 +106,23 @@ int main(void)
 		exit(1);
 	}
 
-	printf("serverTPC: waiting for connections...\n");
-
-	while(1) {  // ????
+    while (1) {
+	
+        printf("serverTPC: waiting for connections...\n");
+        
 		sin_size = sizeof their_addr;
 		new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
 		if (new_fd == -1) {
 			perror("accept");
-			continue;
+            exit(0);
 		}
 
 		inet_ntop(their_addr.ss_family,
 			get_in_addr((struct sockaddr *)&their_addr),
 			s, sizeof s);
 		printf("serverTPC: got connection from %s\n", s);
-        
+    
+    do {  // ????
         if ((numbytes = recv(new_fd, buf, BUFFER_LENGTH-1, 0)) == -1) {
             perror("recv");
             exit(1);
@@ -130,16 +132,19 @@ int main(void)
         printf("client: received '%s'\n",buf);
             
 		if (!fork()) { // ?????
-			close(sockfd); // ?????
             printf("Entrez un message de retour : ");
-            gets(buf);
+            fgets(buf, sizeof(buf), stdin);
 			if (send(new_fd, buf, strlen(buf), 0) == -1)
 				perror("send");
-			close(new_fd);
-			exit(0);
+
 		}
-		close(new_fd);  // ???????
-	}
+		
+    } while(numbytes != 0);
+        
+    
+    close(new_fd);
+        
+    }
 
 	return 0;
 }

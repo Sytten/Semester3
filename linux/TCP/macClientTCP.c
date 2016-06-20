@@ -41,8 +41,8 @@ int main(int argc, char *argv[])
 	int retVal;
 	char s[INET6_ADDRSTRLEN];
 
-	if (argc < 3) {
-	    fprintf(stderr,"Usage: clientTCP hote message\n");
+	if (argc < 2) {
+	    fprintf(stderr,"Usage: clientTCP hote\n");
 	    exit(1);
 	}
 
@@ -55,6 +55,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+    
 	// ??????????????????????
 	for(p = servinfo; p != NULL; p = p->ai_next) {
 		if ((sockfd = socket(p->ai_family, p->ai_socktype,
@@ -81,21 +82,36 @@ int main(int argc, char *argv[])
 			s, sizeof s);
 	printf("clientTCP: connecting to %s\n", s);
 
-	freeaddrinfo(servinfo); // ????
-
-    if (send(sockfd, argv[2], strlen(argv[2]), 0) == -1)
-        perror("send");
+	freeaddrinfo(servinfo); // delete address information
     
-	if ((numOctets = recv(sockfd, buf, TAILLEMAX-1, 0)) == -1) {
-	    perror("recv");
-	    exit(1);
-	}
+   do {
+        printf("enter a message: ");
+        fgets(buf, sizeof(buf), stdin);
+        if (send(sockfd, buf, strlen(buf), 0) == -1)
+            perror("send");
+       
+       if(strcmp(buf,"quit\n") == 0) {
+           printf("EXITING\n");
+           break;
+       }
+        
+        printf("Waiting to receive\n");
+        
+        if ((numOctets = recv(sockfd, buf, TAILLEMAX-1, 0)) == -1) {
+            perror("recv");
+            exit(1);
+        }
 
-	buf[numOctets] = '\0';
+        buf[numOctets] = '\0';
 
-	printf("clientTCP: received '%s'\n",buf);
-
-	close(sockfd);
+        printf("clientTCP: received '%s'\n",buf);
+        
+       
+        
+   } while(1);
+    
+    close(sockfd);
+	
 
 	return 0;
 }
