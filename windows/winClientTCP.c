@@ -74,6 +74,9 @@ main(argc, argv)  int argc; char *argv[];
 		printf("Entrer le message à envoyer: ");
 		gets_s(text, TEXT_LENGH);
 
+		if (strcmp(text, "quit") == 0)
+			break;
+
 		len = strlen(text);
 		if (len != 0)  {
 			if (send(sock, text, len, 0) < 0)
@@ -83,8 +86,7 @@ main(argc, argv)  int argc; char *argv[];
 			}
 		}
 
-		if (strcmp(text, "quit") == 0)
-			break;
+		
 		
 		if ((rval = recv(sock, text, len, 0)) < 0)
 		{
@@ -99,7 +101,6 @@ main(argc, argv)  int argc; char *argv[];
 	} while (rval != 0);
 
 	printf("Fin de connection\n\n");
-	gets_s(text, TEXT_LENGH);
 	closesocket(sock);
 	WSACleanup();
 

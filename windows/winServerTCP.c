@@ -91,21 +91,26 @@ char *argv[];
 		printf("au port %d\n", client.sin_port); /* Imprimer a l'ecran le numero de port */
 
 		if (msgsock < 0)
-		{	perror("lors de l'acceptation"); /* Message d'erreur systeme */
+		{	
+			perror("lors de l'acceptation"); /* Message d'erreur systeme */
 		}
 
 		/* Reception du message */
 		else do  /* Boucle de reception */
-		{	if ((rval = recv(msgsock, buf, sizeof(buf), 0)) < 0)
-			{	perror("lors de la lecture du message");
+
+		{	
+			printf("en attente d'un message");
+			if ((rval = recv(msgsock, buf, sizeof(buf), 0)) < 0)
+			{	
+				perror("lors de la lecture du message");
 			}
-			if (rval == 0)
-				printf("Fin de connection\n\n");
-			else
-			{	buf[rval] = END_OF_STRING;
+
+			if (rval > 0)
+			{	
+				// imprimer le message
+				buf[rval] = END_OF_STRING;
 				printf("Recu: '%s'\n", buf);
-				if (strcmp(buf, "quit") == 0)
-					break;
+
 				printf("Entrer les caracteres+retour de chariot pour envoyer, ou juste retour de chariot pour terminer:\n ");
 				gets_s(buf, BUFFER_LENGTH);
 				length = strlen(buf);
@@ -115,7 +120,8 @@ char *argv[];
 						exit(1);
 					}
 			}
-		} while (rval != 0);
+			printf("rval %d\n", rval);
+		} while (rval > 0);
 
 		printf("Fin de connection\n\n");
 		closesocket(msgsock); /* Fermer le socket connecte au client */
