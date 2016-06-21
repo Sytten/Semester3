@@ -77,7 +77,9 @@ char *argv[];
 
 	/* Boucle d'opération */
 	while (1)  /* Boucle infinie */
-	{	length = sizeof(client);
+	{	
+		printf("en attente de connection\n");
+		length = sizeof(client);
 		msgsock = accept(sock, (struct sockaddr *) &client, &length); /* Call bloquant jusqu'a l'arrivee d'une connection */
 		cname = gethostbyaddr((char *) &client.sin_addr, 4, AF_INET); /* Retrouver des informations a propos du client */
 		if (cname == NULL)
@@ -102,6 +104,8 @@ char *argv[];
 			else
 			{	buf[rval] = END_OF_STRING;
 				printf("Recu: '%s'\n", buf);
+				if (strcmp(buf, "quit") == 0)
+					break;
 				printf("Entrer les caracteres+retour de chariot pour envoyer, ou juste retour de chariot pour terminer:\n ");
 				gets_s(buf, BUFFER_LENGTH);
 				length = strlen(buf);
@@ -113,7 +117,7 @@ char *argv[];
 			}
 		} while (rval != 0);
 
-
+		printf("Fin de connection\n\n");
 		closesocket(msgsock); /* Fermer le socket connecte au client */
 
 
