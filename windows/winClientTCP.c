@@ -43,7 +43,7 @@ main(argc, argv)  int argc; char *argv[];
 		exit(1);
 	}
 
-	/* Création d'un socket de communication  */
+	/* CrŽation d'un socket de communication  */
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		perror("lors de l'ouverture du socket");

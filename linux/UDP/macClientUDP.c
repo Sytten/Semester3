@@ -22,8 +22,8 @@
 
 int main(int argc, char *argv[])
 {
-	int sockfd;
-	struct addrinfo hints, *servinfo, *p;
+	int sockfd;// variable pour référencer le socket
+	struct addrinfo hints, *servinfo, *p; // structures décrivant de l'information sur des adresses
 	int retVal;
 	int numOctets;
     int numbytes;
@@ -32,24 +32,26 @@ int main(int argc, char *argv[])
     char buf[MAXBUFLEN];
     char s[INET6_ADDRSTRLEN];
 
+    // usage de la commande
 	if (argc < 2) {
 		fprintf(stderr,"usage: ClientUDP hote [port]\n");
 		exit(1);
 	}
+    // assgnation du port serveur si ce n'est pas fait
     if(argc != 3)
         argv[2] = PORTSERVEUR;
     
     printf("PORT : %s\n", argv[2]);
 
 	memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_DGRAM;
+	hints.ai_family = AF_INET; // permet IPv4 ou IPv6
+	hints.ai_socktype = SOCK_DGRAM; // connexion UDP
 	if ((retVal = getaddrinfo(argv[1], argv[2], &hints, &servinfo)) != 0) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(retVal));
 		return 1;
 	}
 
-	// ????
+	// creation du socket
 	for(p = servinfo; p != NULL; p = p->ai_next) {
 		if ((sockfd = socket(p->ai_family, p->ai_socktype,
 				p->ai_protocol)) == -1) {
@@ -91,9 +93,8 @@ int main(int argc, char *argv[])
         
     }while(strcmp(buf,"quit") != 0);
 
-	freeaddrinfo(servinfo);
+	freeaddrinfo(servinfo); // supprimer les information de l'addresse serveur
 
-	printf("ClientUDP: sent %d bytes to %s\n", numOctets, argv[1]);
 
 	return 0;
 }

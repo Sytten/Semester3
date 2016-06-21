@@ -32,27 +32,27 @@ void *get_in_addr(struct sockaddr *sa)
 
 int main(void)
 {
-	int sockfd;
-	struct addrinfo hints, *servinfo, *p;
+	int sockfd; // declaration de variables pour référencer un socket
+	struct addrinfo hints, *servinfo, *p; // structures d'information sur les adresses
 	int retVal;
 	int numbytes;
     int numbytes2;
-    struct sockaddr_storage their_addr;
+    struct sockaddr_storage their_addr;// structure de storage d'information sur des clients/serveurs
 	char buf[MAXBUFLEN];
 	socklen_t addr_len;
 	char s[INET6_ADDRSTRLEN];
 
 	memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_INET; // ipv6 ou ipv4 ne dérange pas
-	hints.ai_socktype = SOCK_DGRAM;  // tcp
-	hints.ai_flags = AI_PASSIVE; // 
+	hints.ai_family = AF_INET; // ipv6 ou ipv4
+	hints.ai_socktype = SOCK_DGRAM;  // UDP
+    hints.ai_flags = AI_PASSIVE; // identifier le socket comme un socket qui peut executer des fonctions spécifique au serveur comme connect()
 
 	if ((retVal = getaddrinfo(NULL, MONPORT, &hints, &servinfo)) != 0) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(retVal));
 		return 1;
 	}
 
-	//
+	// créer le socket
 	for(p = servinfo; p != NULL; p = p->ai_next) {
 		if ((sockfd = socket(p->ai_family, p->ai_socktype,
 				p->ai_protocol)) == -1) {
@@ -60,6 +60,7 @@ int main(void)
 			continue;
 		}
 
+        // binding du socket
 		if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
 			close(sockfd);
 			perror("listenerUDP: bind");
@@ -74,11 +75,11 @@ int main(void)
 		return 2;
 	}
 
-	freeaddrinfo(servinfo);
+    freeaddrinfo(servinfo); // suprimer les informations dans la structure d'informatin serveur
 
 	
     while(1) {
-        // receiving message
+        // en attente de réception du message
         printf("listenerUDP: waiting to recvfrom...\n");
         addr_len = sizeof their_addr;
         if ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0,
@@ -88,7 +89,7 @@ int main(void)
         }
         
        
-
+        // imprimer à l'écran de l'information pertinante sur l'inf
         printf("listenerUDP: got packet from %s\n",
                inet_ntop(their_addr.ss_family,
                          get_in_addr((struct sockaddr *)&their_addr),
@@ -97,7 +98,7 @@ int main(void)
         buf[numbytes] = '\0';
         printf("listenerUDP: packet contains \"%s\"\n", buf);
         
-        // send a message
+        // envoyer un message
         printf("enter a message : \n");
        
         gets(buf);

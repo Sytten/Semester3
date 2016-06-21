@@ -35,13 +35,13 @@ void *get_in_addr(struct sockaddr *sa)
 
 int main(int argc, char *argv[])
 {
-	int sockfd, numOctets;  
-	char buf[TAILLEMAX];
-	struct addrinfo hints, *servinfo, *p;
+	int sockfd, numOctets;  // variable pour référencer le socket et pour compter le nombre d'octets lors d'une communication
+	char buf[TAILLEMAX]; // buffer pour mettre les messages dedans
+	struct addrinfo hints, *servinfo, *p; // structures décrivant de l'information sur des adresses
 	int retVal;
-	char s[INET6_ADDRSTRLEN];
+	char s[INET6_ADDRSTRLEN]; // buffer pour l'adresse ip
 
-    
+    // regarder l'usage de la ligne de commande
 	if (argc < 2) {
 	    fprintf(stderr,"Usage: clientTCP hote [port]\n");
 	    exit(1);
