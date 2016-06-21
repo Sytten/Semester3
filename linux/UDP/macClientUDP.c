@@ -70,11 +70,17 @@ int main(int argc, char *argv[])
         // send a message
         printf("enter a message : \n");
         gets(buf);
+        if (strcmp(buf,"quit") == 0) {
+            printf("Quit");
+            break;
+        }
         if ((numOctets = sendto(sockfd, buf, strlen(buf), 0,
                                 p->ai_addr, p->ai_addrlen)) == -1) {
             perror("ClientUDP: sendto");
             exit(1);
         }
+        
+        
         
         // receiving message
         printf("listenerUDP: waiting to recvfrom...\n");
