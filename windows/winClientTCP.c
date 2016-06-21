@@ -62,10 +62,7 @@ main(argc, argv)  int argc; char *argv[];
 	printf("Entrer le numero de port dans la machine distante: ");   
 	gets_s(buf, BUFFER_LENGTH);
 	server.sin_port = htons((short) atoi(buf)); 
-	
-	printf("Entrer le message à envoyer: ");   
-	gets_s(text, TEXT_LENGH);
-	
+
     /*  A faire: connection au serveur  */
 	if (connect(sock, (struct sockaddr *) &server, sizeof(server)) != 0) 
 	{
@@ -73,31 +70,36 @@ main(argc, argv)  int argc; char *argv[];
 		exit(1);
 	}
 	
-	len = strlen(text);
-	if (len != 0)  {
-		if (send(sock, text, len, 0) < 0)
-		{	perror("lors de l'ecriture dans le socket");
-			exit(1);
-		}
-	}
+	do {
+		printf("Entrer le message à envoyer: ");
+		gets_s(text, TEXT_LENGH);
 
-	do  /* Boucle de reception */
-	{ 
+		len = strlen(text);
+		if (len != 0)  {
+			if (send(sock, text, len, 0) < 0)
+			{
+				perror("lors de l'ecriture dans le socket");
+				exit(1);
+			}
+		}
+
+		if (strcmp(text, "quit") == 0)
+			break;
+		
 		if ((rval = recv(sock, text, len, 0)) < 0)
 		{
 			perror("lors de la lecture du message");
 		}
 
-		if (rval == 0)
-			printf("Fin de connection\n\n");
-		else
+		if (rval != 0)
 		{
 			text[rval] = END_OF_STRING;
 			printf("Recu: '%s'\n", text);
-			rval = 0;
 		}
 	} while (rval != 0);
 
+	printf("Fin de connection\n\n");
+	gets_s(text, TEXT_LENGH);
 	closesocket(sock);
 	WSACleanup();
 
