@@ -1,14 +1,21 @@
 package Buffer;
 
+/**
+ * Simple Buffer interface.
+ * @author Departement GEGI Sherbrooke
+ * @version 1.1
+ */
 public interface Buffer
 {
 	/**
-	 * insert an item into the Buffer.
+	 * Insert a new item into the Buffer.
+	 * @param item		Object to insert in the buffer.
 	 */
 	public abstract void insert(Object item);
 
 	/**
-	 * remove an item from the Buffer.
+	 * Remove an item from the Buffer.
+	 * @return			Object removed from the buffer.		
 	 */
 	public abstract Object remove();
 }
