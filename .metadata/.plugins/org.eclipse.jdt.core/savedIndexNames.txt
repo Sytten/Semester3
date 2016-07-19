@@ -1,1 +1,0 @@
-INDEX VERSION 1.127+/media/emile/Data/Programming/S03APP6/.metadata/.plugins/org.eclipse.jdt.core
