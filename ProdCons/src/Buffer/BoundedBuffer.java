@@ -1,6 +1,8 @@
 package Buffer;
 
 import ConcurrenceControl.ImpConcurrenceControl;
+import SharedMemoryUtilities.SharedMemory;
+import Tools.SleepTools;
 
 /**
  * Implementation for the <code>Buffer</code> interface.
@@ -10,27 +12,38 @@ import ConcurrenceControl.ImpConcurrenceControl;
  * @see Buffer
  */
 public class BoundedBuffer implements Buffer {
-	private static final int BUFFER_SIZE = 3;
+	private int bufferSize;
 
-	private volatile int count;
+	private int count;
 
 	private int in; // points to the next free position in the buffer
 	private int out; // points to the next full position in the buffer
-	private Object[] buffer;
+	private SharedMemory sharedMemory;
+	private int sharedMemoryAddr;
+	private int sharedMemorySize;
 	
 	private ImpConcurrenceControl mutex;
 
 	/**
 	 *  Create a BoundedBuffer instance.
 	 */
-	public BoundedBuffer() {
+	public BoundedBuffer(int sharedMemoryAddr, int sharedMemorySize) {
 		// buffer is initially empty
 		count = 0;
 		in = 0;
 		out = 0;
+		
+		this.sharedMemoryAddr = sharedMemoryAddr;
+		this.sharedMemorySize = sharedMemorySize;
+		
+		bufferSize = sharedMemorySize - 2;
+		if(this.bufferSize <= 0) {
+			System.out.println("BOUNDEDBUFFER: shared memory size must be at least of size 3");
+			System.exit(1);
+		}
 
-		buffer = new Object[BUFFER_SIZE];
-		mutex = new ImpConcurrenceControl();
+		sharedMemory = new SharedMemory();
+		mutex = new ImpConcurrenceControl(sharedMemoryAddr, sharedMemorySize);
 	}
 
 	/* 
@@ -38,18 +51,23 @@ public class BoundedBuffer implements Buffer {
 	 * @inheritDoc
 	 */
 	public void insert(Object item) {
-		while (count == BUFFER_SIZE)
-			; // do nothing
+		while (Integer.parseInt(SharedMemory.read(sharedMemoryAddr, sharedMemorySize - 1)) == bufferSize) {
+			SleepTools.nap(1);
+		}
 
 		// add an item to the buffer
 		mutex.acquire();
+		
+		count = Integer.parseInt(SharedMemory.read(sharedMemoryAddr, sharedMemorySize - 1));
 		++count;
-		buffer[in] = item;
+		SharedMemory.write(sharedMemoryAddr, sharedMemorySize - 1, String.valueOf(count));
+		
+		SharedMemory.write(sharedMemoryAddr, in, (String) item);
 		mutex.release();
 		
-		in = (in + 1) % BUFFER_SIZE;
+		in = (in + 1) % bufferSize;
 
-		if (count == BUFFER_SIZE)
+		if (count == bufferSize)
 			System.out.println("BOUNDEDBUFFER: Le produit " + item + " a ete enmagasine. Buffer PLEIN!!!");
 		else
 			System.out.println(
@@ -63,15 +81,21 @@ public class BoundedBuffer implements Buffer {
 	public Object remove() {
 		Object item;
 
-		while (count == 0)
-			; // do nothing
+		while (Integer.parseInt(SharedMemory.read(sharedMemoryAddr, sharedMemorySize - 1)) == 0) {
+			SleepTools.nap(1);
+		}
 
 		// remove an item from the buffer
 		mutex.acquire();
+		
+		count = Integer.parseInt(SharedMemory.read(sharedMemoryAddr, sharedMemorySize - 1));
 		--count;
-		item = buffer[out];
+		SharedMemory.write(sharedMemoryAddr, sharedMemorySize - 1, String.valueOf(count));
+		
+		item = SharedMemory.read(sharedMemoryAddr, out);
 		mutex.release();
-		out = (out + 1) % BUFFER_SIZE;
+		
+		out = (out + 1) % bufferSize;
 
 		if (count == 0)
 			System.out.println("BOUNDEDBUFFER: Le produit " + item + " a ete consomme. Buffer VIDE");

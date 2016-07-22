@@ -40,7 +40,7 @@ public class SharedMemory
    */
   public static native void displaySharedMemory(int handle);
 
-  SharedMemory(){
+  public SharedMemory(){
     try
     {
       // Pour chercher la libraire native, elle doit se nommer

@@ -1,23 +1,32 @@
 package ConcurrenceControl;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
+import SharedMemoryUtilities.SharedMemory;
 import Tools.SleepTools;
 
 public class ImpConcurrenceControl implements ConcurrenceControl {
 
-	private AtomicBoolean available = new AtomicBoolean(true);
+	private SharedMemory sharedMemory;
+	private int sharedMemoryAddr;
+	private int sharedMemorySize;
+	
+	public ImpConcurrenceControl(int sharedMemoryAddr, int sharedMemorySize) {
+		sharedMemory = new SharedMemory();
+		this.sharedMemoryAddr = sharedMemoryAddr;
+		this.sharedMemorySize = sharedMemorySize;
+		
+		SharedMemory.write(sharedMemoryAddr, sharedMemorySize - 2, "true");
+	}
 	
 	@Override
 	public void acquire() {
-		while(!available.get()) { SleepTools.nap(1); }
+		while(!Boolean.parseBoolean(SharedMemory.read(sharedMemoryAddr, sharedMemorySize - 2))) { SleepTools.nap(1); }
 		
-		available.set(false);
+		SharedMemory.write(sharedMemoryAddr, sharedMemorySize - 2, "false");
 	}
 
 	@Override
 	public void release() {
-		available.set(true);
+		SharedMemory.write(sharedMemoryAddr, sharedMemorySize - 2, "true");
 	}
 
 }

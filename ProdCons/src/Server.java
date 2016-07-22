@@ -2,25 +2,42 @@ import Buffer.BoundedBuffer;
 import Buffer.Buffer;
 import Consumer.Consumer;
 import Producer.Producer;
+import SharedMemoryUtilities.SharedMemory;
+
 /**
- * This <code>Server</code> class contains the <code>main</code> method to strat the program.
+ * This <code>Server</code> class contains the <code>main</code> method to strat
+ * the program.
+ * 
  * @author Departement GEGI Sherbrooke
  * @version 1.1
  */
-public class Server
-{
+public class Server {
 	/**
 	 * Start <code>main</code> program code.
-	 * @param args		The arguments passed to the program.
+	 * 
+	 * @param args
+	 *            The arguments passed to the program.
 	 */
 	public static void main(String args[]) {
-		Buffer server = new BoundedBuffer();
+		
+		if(args.length != 3) {
+			System.out.println("FONCTIONNEMENT: java server {p|c} {sharedMemoryAdrr} {sharedMemorySize}");
+			System.exit(1);
+		}
+		
+		Buffer server = new BoundedBuffer(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
 
-      		// now create the producer and consumer threads
-      		Thread producerThread = new Thread(new Producer(server));
-      		Thread consumerThread = new Thread(new Consumer(server));
-      
-      		producerThread.start();
-      		consumerThread.start();               
+		// now create the producer and consumer threads
+		if (args[0].equals("p")) {
+			SharedMemory sharedMemory = new SharedMemory();
+			SharedMemory.write(Integer.parseInt(args[1]), Integer.parseInt(args[2]) - 1, String.valueOf(0));
+			
+			Thread producerThread = new Thread(new Producer(server));
+			producerThread.start();
+		} else if (args[0].equals("c")) {
+			Thread consumerThread = new Thread(new Consumer(server));
+			consumerThread.start();
+		}
+
 	}
 }

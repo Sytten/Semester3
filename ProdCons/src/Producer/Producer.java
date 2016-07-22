@@ -27,6 +27,8 @@ public class Producer implements Runnable {
 		while (true) {
 			System.out.println("PRODUCTEUR: En train de dormir...");
 			
+			SleepTools.nap(5);
+			
 			message = new String("Produit...");
 			System.out.println("PRODUCTEUR: Message produit " + message);
 
