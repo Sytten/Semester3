@@ -13,8 +13,6 @@ public class ImpConcurrenceControl implements ConcurrenceControl {
 		sharedMemory = new SharedMemory();
 		this.sharedMemoryAddr = sharedMemoryAddr;
 		this.sharedMemorySize = sharedMemorySize;
-		
-		SharedMemory.write(sharedMemoryAddr, sharedMemorySize - 2, "true");
 	}
 	
 	@Override
