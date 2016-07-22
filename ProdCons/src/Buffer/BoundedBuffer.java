@@ -1,5 +1,7 @@
 package Buffer;
 
+import ConcurrenceControl.ImpConcurrenceControl;
+
 /**
  * Implementation for the <code>Buffer</code> interface.
  * 
@@ -15,6 +17,8 @@ public class BoundedBuffer implements Buffer {
 	private int in; // points to the next free position in the buffer
 	private int out; // points to the next full position in the buffer
 	private Object[] buffer;
+	
+	private ImpConcurrenceControl mutex;
 
 	/**
 	 *  Create a BoundedBuffer instance.
@@ -26,6 +30,7 @@ public class BoundedBuffer implements Buffer {
 		out = 0;
 
 		buffer = new Object[BUFFER_SIZE];
+		mutex = new ImpConcurrenceControl();
 	}
 
 	/* 
@@ -37,8 +42,11 @@ public class BoundedBuffer implements Buffer {
 			; // do nothing
 
 		// add an item to the buffer
+		mutex.acquire();
 		++count;
 		buffer[in] = item;
+		mutex.release();
+		
 		in = (in + 1) % BUFFER_SIZE;
 
 		if (count == BUFFER_SIZE)
@@ -59,8 +67,10 @@ public class BoundedBuffer implements Buffer {
 			; // do nothing
 
 		// remove an item from the buffer
+		mutex.acquire();
 		--count;
 		item = buffer[out];
+		mutex.release();
 		out = (out + 1) % BUFFER_SIZE;
 
 		if (count == 0)

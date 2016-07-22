@@ -20,7 +20,7 @@ public class SleepTools
 	 * @param duration This parameter is unused. 
 	 */
 	public static void nap(int duration) {
-        	int sleeptime = (int) (NAP_TIME * Math.random() );
+        	int sleeptime = (int) (duration * Math.random() );
         	try { Thread.sleep(sleeptime*1000); }
         	catch (InterruptedException e) {}
 	}
