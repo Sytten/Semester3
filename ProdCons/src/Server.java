@@ -31,7 +31,7 @@ public class Server {
 		if (args[0].equals("p")) {
 			SharedMemory sharedMemory = new SharedMemory();
 			SharedMemory.write(Integer.parseInt(args[1]), Integer.parseInt(args[2]) - 1, String.valueOf(0));
-			SharedMemory.write(Integer.parseInt(args[1]), Integer.parseInt(args[2]) - 2, "true");
+			SharedMemory.write(Integer.parseInt( args[1]), Integer.parseInt(args[2]) - 2, "true");
 			
 			Thread producerThread = new Thread(new Producer(server));
 			producerThread.start();
