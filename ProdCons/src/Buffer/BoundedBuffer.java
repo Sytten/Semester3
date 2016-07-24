@@ -10,7 +10,7 @@ import Tools.SleepTools;
  * @author Departement GEGI Sherbrooke
  * @author Emile Fugulin
  * @author Philippe Girard
- * @version 1.1
+ * @version 1.2
  * @see Buffer
  */
 public class BoundedBuffer implements Buffer {

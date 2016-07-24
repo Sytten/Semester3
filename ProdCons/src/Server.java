@@ -9,7 +9,7 @@ import SharedMemoryUtilities.SharedMemory;
  * the program.
  * 
  * @author Departement GEGI Sherbrooke
- * @version 1.1
+ * @version 1.2
  */
 public class Server {
 	/**
