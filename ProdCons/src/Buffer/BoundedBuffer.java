@@ -50,6 +50,7 @@ public class BoundedBuffer implements Buffer {
 		String memoryValueOfCount = SharedMemory.read(sharedMemoryAddr, sharedMemorySize - 1);
 		String memoryValueOfAvailable = SharedMemory.read(sharedMemoryAddr, sharedMemorySize - 2);
 		if (memoryValueOfAvailable.isEmpty() || memoryValueOfCount.isEmpty()) {
+			System.out.println("ECRITURE");
 			SharedMemory.write(sharedMemoryAddr, sharedMemorySize - 1, String.valueOf(0));
 			SharedMemory.write(sharedMemoryAddr, sharedMemorySize - 2, "true");
 		}
