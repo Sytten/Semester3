@@ -8,14 +8,14 @@ import Tools.SleepTools;
  * Implementation for the <code>Buffer</code> interface.
  * 
  * @author Departement GEGI Sherbrooke
+ * @author Emile Fugulin
+ * @author Philippe Girard
  * @version 1.1
  * @see Buffer
  */
 public class BoundedBuffer implements Buffer {
 	private int bufferSize;
-
 	private int count;
-
 	private int in; // points to the next free position in the buffer
 	private int out; // points to the next full position in the buffer
 	private SharedMemory sharedMemory;
@@ -57,7 +57,7 @@ public class BoundedBuffer implements Buffer {
 
 	}
 
-	/*
+	/**
 	 * Producer calls this method.
 	 * 
 	 * @inheritDoc
@@ -86,7 +86,7 @@ public class BoundedBuffer implements Buffer {
 					"BOUNDEDBUFFER: Le produit " + item + "a ete enmagasine. Il y a = " + count + " produits.");
 	}
 
-	/*
+	/**
 	 * Consumer calls this method.
 	 * 
 	 * @inheritDoc
