@@ -7,7 +7,9 @@ import Tools.SleepTools;
  * Produce message in the buffer.
  * 
  * @author Departement GEGI Sherbrooke
- * @version 1.1
+ * @author Emile Fugulin
+ * @author Philippe Girard
+ * @version 1.2 - Use an ID for each message
  */
 public class Producer implements Runnable {
 	/**
@@ -25,12 +27,17 @@ public class Producer implements Runnable {
 		String message;
 
 		while (true) {
-			System.out.println("PRODUCTEUR: En train de dormir...");
+			System.out.println("PRODUCER: Sleeping");
 			
 			SleepTools.nap(5);
 			
-			message = new String("Produit...");
-			System.out.println("PRODUCTEUR: Message produit " + message);
+			message = new String("P" + String.valueOf(id));
+			System.out.println("PRODUCER: " + message);
+			
+			id++;
+			
+			if(id >= 10000)
+				id = 0;
 
 			buffer.insert(message);
 		}
@@ -40,4 +47,6 @@ public class Producer implements Runnable {
 	 * Buffer to consume.
 	 */
 	private Buffer buffer;
+	
+	private int id = 0;
 }

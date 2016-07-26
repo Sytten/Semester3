@@ -1,7 +1,6 @@
 package ConcurrenceControl;
 
 import SharedMemoryUtilities.SharedMemory;
-import Tools.SleepTools;
 /**
  * Implementation of concurrence Control.
  * This is an implementation of a mutex to control access to critical sections in code. 
@@ -11,7 +10,7 @@ import Tools.SleepTools;
  * 
  * @author Emile Fugulin
  * @author Philippe Girard
- * @version 1.1
+ * @version 1.2 - Return a boolean when acquire instead of waiting.
  * @see ConcurrenceControl
  *
  */
@@ -37,17 +36,20 @@ public class ImpConcurrenceControl implements ConcurrenceControl {
 	 * Wait until a token is available then take it.
 	 */
 	@Override
-	public void acquire() {
-		while(!Boolean.parseBoolean(SharedMemory.read(sharedMemoryAddr, sharedMemorySize - 2))) { SleepTools.nap(1); }
-		
-		SharedMemory.write(sharedMemoryAddr, sharedMemorySize - 2, "false");
+	public synchronized boolean acquire() {
+		if(Boolean.parseBoolean(SharedMemory.read(sharedMemoryAddr, sharedMemorySize - 2))) {
+			SharedMemory.write(sharedMemoryAddr, sharedMemorySize - 2, "false");
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**
 	 * release the token.
 	 */
 	@Override
-	public void release() {
+	public synchronized void release() {
 		SharedMemory.write(sharedMemoryAddr, sharedMemorySize - 2, "true");
 	}
 

@@ -7,7 +7,9 @@ import Tools.SleepTools;
  * Consume buffer messages.
  * 
  * @author Departement GEGI Sherbrooke
- * @version 1.1
+ * @author Emile Fugulin
+ * @author Philippe Girard
+ * @version 1.2 - Display product being removed from buffer
  */
 public class Consumer implements Runnable {
 
@@ -26,13 +28,15 @@ public class Consumer implements Runnable {
 		String message;
 
 		while (true) {
-			System.out.println("CONSOMMATEUR: En train de dormir...");
+			System.out.println("CONSUMER: Sleeping");
 			
 			SleepTools.nap(5);
-
-			System.out.println("CONSOMMATEUR: Pret a consommer...");
-
+			
 			message = (String) buffer.remove();
+
+			System.out.println("CONSUMER: " + message);
+
+			
 		}
 	}
 

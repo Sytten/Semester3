@@ -8,9 +8,10 @@ package ConcurrenceControl;
 public interface ConcurrenceControl {
 
 	/**
-	 * Acquire a token if there is one. If not wait. 
+	 * Acquire a token if there is one.
+	 * @return	boolean		Token was acquired.
 	 */
-	public abstract void acquire();
+	public abstract boolean acquire();
 
 	/**
 	 * Release a token. 

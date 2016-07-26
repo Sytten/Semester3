@@ -5,12 +5,12 @@ import SharedMemoryUtilities.SharedMemory;
 import Tools.SleepTools;
 
 /**
- * Implementation for the <code>Buffer</code> interface.
+ * Implementation for the <code>Buffer</code> interface using a shared memory.
  * 
  * @author Departement GEGI Sherbrooke
  * @author Emile Fugulin
  * @author Philippe Girard
- * @version 1.2
+ * @version 1.3 - Use the return value of the acquire in the waiting while and display where the item is stored/removed.
  * @see Buffer
  */
 public class BoundedBuffer implements Buffer {
@@ -58,18 +58,15 @@ public class BoundedBuffer implements Buffer {
 	}
 
 	/**
-	 * Producer calls this method.
-	 * 
-	 * @inheritDoc
+	 * Producer calls this method. Insert a new item into the shared memory.
+	 * @param 	item	Object to insert in the buffer.
 	 */
-	public void insert(Object item) {
-		while (Integer.parseInt(SharedMemory.read(sharedMemoryAddr, sharedMemorySize - 1)) == bufferSize) {
+	public synchronized void insert(Object item) {
+		while (Integer.parseInt(SharedMemory.read(sharedMemoryAddr, sharedMemorySize - 1)) == bufferSize || !mutex.acquire()) {
 			SleepTools.nap(1);
 		}
 
 		// add an item to the buffer
-		mutex.acquire();
-
 		count = Integer.parseInt(SharedMemory.read(sharedMemoryAddr, sharedMemorySize - 1));
 		++count;
 		SharedMemory.write(sharedMemoryAddr, sharedMemorySize - 1, String.valueOf(count));
@@ -77,44 +74,39 @@ public class BoundedBuffer implements Buffer {
 		SharedMemory.write(sharedMemoryAddr, in, (String) item);
 		mutex.release();
 
+		System.out.println("BOUNDEDBUFFER: " + item + " stored at position " + in);
+		
+		if(count == bufferSize)
+			System.out.println("BOUNDEDBUFFER: Buffer full");
+		
 		in = (in + 1) % bufferSize;
-
-		if (count == bufferSize)
-			System.out.println("BOUNDEDBUFFER: Le produit " + item + " a ete enmagasine. Buffer PLEIN!!!");
-		else
-			System.out.println(
-					"BOUNDEDBUFFER: Le produit " + item + "a ete enmagasine. Il y a = " + count + " produits.");
 	}
 
 	/**
-	 * Consumer calls this method.
-	 * 
-	 * @inheritDoc
+	 * Consumer calls this method. Remove an item from the shared memory.
+	 * @return	item	Object removed from the buffer.	
 	 */
-	public Object remove() {
+	public synchronized Object remove() {
 		Object item;
 
-		while (Integer.parseInt(SharedMemory.read(sharedMemoryAddr, sharedMemorySize - 1)) == 0) {
+		while (Integer.parseInt(SharedMemory.read(sharedMemoryAddr, sharedMemorySize - 1)) == 0 || !mutex.acquire()) {
 			SleepTools.nap(1);
 		}
 
 		// remove an item from the buffer
-		mutex.acquire();
-
 		count = Integer.parseInt(SharedMemory.read(sharedMemoryAddr, sharedMemorySize - 1));
 		--count;
 		SharedMemory.write(sharedMemoryAddr, sharedMemorySize - 1, String.valueOf(count));
 
 		item = SharedMemory.read(sharedMemoryAddr, out);
 		mutex.release();
+		
+		System.out.println("BOUNDEDBUFFER: " + item + " removed at position " + out);
+		
+		if(count == 0)
+			System.out.println("BOUNDEDBUFFER: Buffer empty");
 
 		out = (out + 1) % bufferSize;
-
-		if (count == 0)
-			System.out.println("BOUNDEDBUFFER: Le produit " + item + " a ete consomme. Buffer VIDE");
-		else
-			System.out
-					.println("BOUNDEDBUFFER: Le produit " + item + " a ete consomme. Il y a = " + count + " produits.");
 
 		return item;
 	}

@@ -5,18 +5,17 @@ import Producer.Producer;
 import SharedMemoryUtilities.SharedMemory;
 
 /**
- * This <code>Server</code> class contains the <code>main</code> method to strat
+ * This <code>Server</code> class contains the <code>main</code> method to start
  * the program.
  * 
  * @author Departement GEGI Sherbrooke
- * @version 1.2
+ * @version 1.2 - Create producer or consumer depending on the arguments passed
  */
 public class Server {
 	/**
 	 * Start <code>main</code> program code.
 	 * 
-	 * @param args
-	 *            The arguments passed to the program.
+	 * @param	args	The arguments passed to the program.
 	 */
 	public static void main(String args[]) {
 		
